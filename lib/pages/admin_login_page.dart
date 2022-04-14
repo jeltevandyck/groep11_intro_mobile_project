@@ -1,6 +1,9 @@
 import 'dart:ui';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:groep11_intro_mobile_project/pages/student_login_page.dart';
 
 class AdminLoginPage extends StatefulWidget {
   const AdminLoginPage({Key? key}) : super(key: key);
@@ -14,6 +17,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  final _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +83,9 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
           child: MaterialButton(
             padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             minWidth: MediaQuery.of(context).size.width,
-            onPressed: () {},
+            onPressed: () {
+              signIn(emailController.text, passwordController.text);
+            },
             child: const Text('Login',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -150,5 +157,13 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
       constraints: const BoxConstraints.expand(),
       child: backgroundImage,
     );
+  }
+
+  void signIn(String email, String password) async {
+    if (_formKey.currentState!.validate()) {
+      await _auth
+          .signInWithEmailAndPassword(email: email, password: password)
+          .then((uid) => Fluttertoast.showToast(msg: "Login Succesful"));
+    }
   }
 }
