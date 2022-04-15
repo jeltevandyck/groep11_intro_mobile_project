@@ -1,6 +1,9 @@
 import 'dart:ui';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:groep11_intro_mobile_project/pages/create_student_page.dart';
 
 import 'admin_login_page.dart';
 
@@ -13,6 +16,8 @@ class StudentLoginPage extends StatefulWidget {
 
 class _StudentLoginPageState extends State<StudentLoginPage> {
   final _formKey = GlobalKey<FormState>();
+
+  final _auth = FirebaseAuth.instance;
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -41,7 +46,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
           filled: true,
           prefixIcon: const Icon(Icons.account_circle),
           contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-          hintText: 'S-Number',
+          hintText: 'Email',
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(30))),
     );
 
@@ -54,7 +59,9 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
           child: MaterialButton(
             padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             minWidth: MediaQuery.of(context).size.width,
-            onPressed: () {},
+            onPressed: () {
+              signIn(emailController.text);
+            },
             child: const Text('Login',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -77,7 +84,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const AdminLoginPage()));
+                      builder: (context) => const CreateStudentPage()));
             },
             child: const Text('Login as admin',
                 textAlign: TextAlign.center,
@@ -133,5 +140,12 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
       constraints: const BoxConstraints.expand(),
       child: backgroundImage,
     );
+  }
+  void signIn(String email) async {
+    if (_formKey.currentState!.validate()) {
+      await _auth
+          .signInWithEmailAndPassword(email: email, password: "default")
+          .then((uid) => Fluttertoast.showToast(msg: "Login Succesful"));
+    }
   }
 }
