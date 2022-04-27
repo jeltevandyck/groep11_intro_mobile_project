@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:groep11_intro_mobile_project/pages/create_student_page.dart';
+import 'package:groep11_intro_mobile_project/pages/admin-dashboard/create_student_page.dart';
 
 import 'admin_login_page.dart';
 
@@ -141,6 +141,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
       child: backgroundImage,
     );
   }
+
   void signIn(String email) async {
     if (_formKey.currentState!.validate()) {
       await _auth

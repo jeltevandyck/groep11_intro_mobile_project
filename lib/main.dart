@@ -1,12 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-
+import 'package:groep11_intro_mobile_project/pages/admin-dashboard/create_exam_page.dart';
 
 import 'pages/student_login_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp( options: const FirebaseOptions(
+  await Firebase.initializeApp(
+    options: const FirebaseOptions(
       apiKey: "AIzaSyBst5neVVQUOheg8wur9JnXyuUSDJMezbo",
       appId: "1:1050149621647:android:b5ae192a1f1ef3f4a5c5fa",
       messagingSenderId: "1050149621647",
@@ -23,11 +24,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Login page',
-      theme: ThemeData(
-        primarySwatch: Colors.red
-      ),
-      home: const StudentLoginPage(),
+      theme: ThemeData(primarySwatch: Colors.red),
+      home: const CreateExamPage(),
     );
   }
 }

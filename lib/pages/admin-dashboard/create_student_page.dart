@@ -14,7 +14,6 @@ class CreateStudentPage extends StatefulWidget {
 }
 
 class _CreateStudentPageState extends State<CreateStudentPage> {
-
   final _auth = FirebaseAuth.instance;
 
   final _formKey = GlobalKey<FormState>();
@@ -34,7 +33,6 @@ class _CreateStudentPageState extends State<CreateStudentPage> {
 
   @override
   Widget build(BuildContext context) {
-
     final firstNameField = TextFormField(
       autofocus: false,
       controller: firstNameEditingController,
@@ -116,7 +114,7 @@ class _CreateStudentPageState extends State<CreateStudentPage> {
       controller: accountNumberEditingController,
       keyboardType: TextInputType.name,
       // validator: (value) {
-      //   
+      //
       // },
       onSaved: (value) {
         accountNumberEditingController.text = value!;
@@ -130,58 +128,6 @@ class _CreateStudentPageState extends State<CreateStudentPage> {
           hintText: 'Account Number',
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(30))),
     );
-
-    // final passwordField = TextFormField(
-    //   autofocus: false,
-    //   controller: passwordEditingController,
-    //   obscureText: true,
-    //   validator: (value) {
-    //     if (value!.isEmpty) {
-    //       return ("Please enter your email.");
-    //     }
-    //     if (!RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]").hasMatch(value)) {
-    //       return ('Please enter a valid email.');
-    //     }
-    //     return null;
-    //   },
-    //   onSaved: (value) {
-    //     passwordEditingController.text = value!;
-    //   },
-    //   textInputAction: TextInputAction.next,
-    //   decoration: InputDecoration(
-    //       fillColor: Colors.white,
-    //       filled: true,
-    //       prefixIcon: const Icon(Icons.account_circle),
-    //       contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-    //       hintText: 'Password',
-    //       border: OutlineInputBorder(borderRadius: BorderRadius.circular(30))),
-    // );
-
-    // final confirmPasswordField = TextFormField(
-    //   autofocus: false,
-    //   controller: confirmPasswordEditingController,
-    //   obscureText: true,
-    //   validator: (value) {
-    //     if (value!.isEmpty) {
-    //       return ("Please enter your email.");
-    //     }
-    //     if (!RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]").hasMatch(value)) {
-    //       return ('Please enter a valid email.');
-    //     }
-    //     return null;
-    //   },
-    //   onSaved: (value) {
-    //     confirmPasswordEditingController.text = value!;
-    //   },
-    //   textInputAction: TextInputAction.done,
-    //   decoration: InputDecoration(
-    //       fillColor: Colors.white,
-    //       filled: true,
-    //       prefixIcon: const Icon(Icons.account_circle),
-    //       contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-    //       hintText: 'Confirm Password',
-    //       border: OutlineInputBorder(borderRadius: BorderRadius.circular(30))),
-    // );
 
     final createStudentButton = Material(
         elevation: 5,
@@ -204,8 +150,7 @@ class _CreateStudentPageState extends State<CreateStudentPage> {
           ),
         ));
 
-
-final backgroundImage = Container(
+    final backgroundImage = Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
           image: AssetImage('assets/images/ap2.jpg'),
@@ -271,22 +216,21 @@ final backgroundImage = Container(
     );
   }
 
-  void CreateStudent(String email) async{
-    
+  void CreateStudent(String email) async {
     const defaultPassword = "default";
 
-    if(_formKey.currentState!.validate()){
-      await _auth.createUserWithEmailAndPassword(email: email, password: defaultPassword)
-      .then((value) => {
-        postDetailsToFirestore()
-      }).catchError((e){
+    if (_formKey.currentState!.validate()) {
+      await _auth
+          .createUserWithEmailAndPassword(
+              email: email, password: defaultPassword)
+          .then((value) => {postDetailsToFirestore()})
+          .catchError((e) {
         Fluttertoast.showToast(msg: e!.message);
       });
     }
   }
 
   postDetailsToFirestore() async {
-
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     User? user = _auth.currentUser;
     UserModel userModel = UserModel();
@@ -299,11 +243,10 @@ final backgroundImage = Container(
     userModel.role = "STUDENT";
 
     await firebaseFirestore
-      .collection("users")
-      .doc(user.uid)
-      .set(userModel.toMap());
-    
+        .collection("users")
+        .doc(user.uid)
+        .set(userModel.toMap());
+
     Fluttertoast.showToast(msg: "The student has been created succesfully!");
   }
-
 }
