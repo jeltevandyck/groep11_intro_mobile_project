@@ -163,13 +163,12 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
     if (_formKey.currentState!.validate()) {
       await _auth
           .signInWithEmailAndPassword(email: email, password: password)
-          .then((uid) => {
-                Fluttertoast.showToast(msg: "Login Succesful"),
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const CreateExamPage())),
-              });
+          .then((uid) => Fluttertoast.showToast(msg: "Login Succesful"));
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const CreateExamPage()),
+      );
     }
   }
 }

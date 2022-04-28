@@ -48,51 +48,13 @@ class _CreateExamPageState extends State<CreateExamPage> {
 
   Widget showExamData() {
     if (exams.isEmpty) {
-      final examNameField = TextField(
-        autofocus: false,
-        controller: examNameControler,
-        keyboardType: TextInputType.text,
-        decoration: InputDecoration(
-            fillColor: Colors.white,
-            filled: true,
-            prefixIcon: const Icon(Icons.account_circle),
-            contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-            hintText: 'Exam Name',
-            border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(30))),
-      );
-
       return Center(
         child: TextButton(
           onPressed: () {
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('Create a new exam'),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        examNameField,
-                      ],
-                    ),
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text('Cancel'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                      TextButton(
-                        child: const Text('Create',
-                            style: TextStyle(color: Colors.green)),
-                        onPressed: () {
-                          pushExamToDatabase();
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
-                  );
+                  return createDialog();
                 });
           },
           child: const Text('Create Exam'),
@@ -117,6 +79,46 @@ class _CreateExamPageState extends State<CreateExamPage> {
             }),
       );
     }
+  }
+
+  Widget createDialog() {
+    final examNameField = TextField(
+      autofocus: false,
+      controller: examNameControler,
+      keyboardType: TextInputType.text,
+      decoration: InputDecoration(
+          fillColor: Colors.white,
+          filled: true,
+          prefixIcon: const Icon(Icons.account_circle),
+          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+          hintText: 'Exam Name',
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(30))),
+    );
+
+    return AlertDialog(
+      title: const Text('Create a new exam'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          examNameField,
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: const Text('Cancel'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        TextButton(
+          child: const Text('Create', style: TextStyle(color: Colors.green)),
+          onPressed: () {
+            pushExamToDatabase();
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    );
   }
 
   popExamsFromDatabase() async {
