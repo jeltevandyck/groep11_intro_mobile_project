@@ -84,7 +84,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const CreateStudentPage()));
+                      builder: (context) => const AdminLoginPage()));
             },
             child: const Text('Login as admin',
                 textAlign: TextAlign.center,

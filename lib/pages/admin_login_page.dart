@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:groep11_intro_mobile_project/pages/admin-dashboard/create_exam_page.dart';
 
 class AdminLoginPage extends StatefulWidget {
   const AdminLoginPage({Key? key}) : super(key: key);
@@ -163,6 +164,11 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
       await _auth
           .signInWithEmailAndPassword(email: email, password: password)
           .then((uid) => Fluttertoast.showToast(msg: "Login Succesful"));
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const CreateExamPage()),
+      );
     }
   }
 }
