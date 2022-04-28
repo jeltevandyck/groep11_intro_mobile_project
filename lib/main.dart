@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Login page',
       theme: ThemeData(primarySwatch: Colors.red),
-      home: const CreateExamPage(),
+      home: const StudentLoginPage(),
     );
   }
 }

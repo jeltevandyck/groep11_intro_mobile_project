@@ -75,7 +75,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
         elevation: 5,
         borderRadius: BorderRadius.circular(30),
         color: Colors.red,
-        child: Container(
+        child: SizedBox(
           width: 200,
           child: MaterialButton(
             padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
