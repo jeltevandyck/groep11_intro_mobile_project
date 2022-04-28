@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class StudentsPage extends StatefulWidget {
   const StudentsPage({Key? key}) : super(key: key);
@@ -8,10 +8,11 @@ class StudentsPage extends StatefulWidget {
 }
 
 class _StudentsPageState extends State<StudentsPage> {
+  int currentindex=0;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: const Text('Students'),
+    return const Scaffold(
+      body: Text("test students"),
     );
   }
 }

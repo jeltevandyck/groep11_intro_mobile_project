@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:groep11_intro_mobile_project/pages/admin-dashboard/admin_dashboard_page.dart';
 import 'package:groep11_intro_mobile_project/pages/admin-dashboard/create_exam_page.dart';
 
 class AdminLoginPage extends StatefulWidget {
@@ -167,7 +168,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
 
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const CreateExamPage()),
+        MaterialPageRoute(builder: (context) => const AdminDashboardPage()),
       );
     }
   }
