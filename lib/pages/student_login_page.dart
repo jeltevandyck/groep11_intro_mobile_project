@@ -54,7 +54,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
         elevation: 5,
         borderRadius: BorderRadius.circular(30),
         color: Colors.red,
-        child: Container(
+        child: SizedBox(
           width: 200,
           child: MaterialButton(
             padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
@@ -84,9 +84,9 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const CreateStudentPage()));
+                      builder: (context) => const AdminLoginPage()));
             },
-            child: const Text('Login as admin',
+            child: const Text('Admin login',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
