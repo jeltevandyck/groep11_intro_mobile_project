@@ -96,13 +96,15 @@ class _StudentsPageState extends State<StudentsPage> {
                               ? (documentSnapshot["fullName"])
                               : ""),
                         ),
-                      ));
+                      )
+                    );
                 },
               );
             }
             return const Text("temp");
           },
-        ));
+        )
+      );
   }
 
 }
