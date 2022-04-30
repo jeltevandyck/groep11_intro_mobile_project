@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:groep11_intro_mobile_project/pages/admin-dashboard/create_student_page.dart';
+import 'package:groep11_intro_mobile_project/pages/admin-dashboard/students_page.dart';
 
 import 'admin_login_page.dart';
 
@@ -84,7 +85,7 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const AdminLoginPage()));
+                      builder: (context) => const StudentsPage()));
             },
             child: const Text('Admin login',
                 textAlign: TextAlign.center,
