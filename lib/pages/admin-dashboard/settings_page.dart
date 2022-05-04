@@ -10,38 +10,41 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  final TextEditingController emailEditingController = TextEditingController();
+  
+  final TextEditingController passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   
 
   @override
   Widget build(BuildContext context) {
-    final emailField = TextFormField(
-    autofocus: false,
-    controller: emailEditingController,
-    keyboardType: TextInputType.emailAddress,
-    validator: (value) {
-      if (value!.isEmpty) {
-        return ("Please enter your email.");
-      }
-      if (!RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]").hasMatch(value)) {
-        return ('Please enter a valid email.');
-      }
-      return null;
-    },
-    onSaved: (value) {
-      emailEditingController.text = value!;
-    },
-    textInputAction: TextInputAction.next,
-    decoration: InputDecoration(
-        fillColor: Colors.white,
-        filled: true,
-        prefixIcon: const Icon(Icons.account_circle),
-        contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: 'Email',
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(30))),
-  );
+    final passwordField = TextFormField(
+      autofocus: false,
+      controller: passwordController,
+      validator: (value) {
+        RegExp regexp = RegExp(r'^.{6,}$');
+        if (value!.isEmpty) {
+          return ("Please enter your password.");
+        }
+        if (!regexp.hasMatch(value)) {
+          return ('Please enter a valid password.');
+        }
+        return null;
+      },
+      onSaved: (value) {
+        passwordController.text = value!;
+      },
+      obscureText: true,
+      textInputAction: TextInputAction.done,
+      decoration: InputDecoration(
+          fillColor: Colors.white,
+          filled: true,
+          prefixIcon: const Icon(Icons.vpn_key),
+          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+          hintText: 'Password',
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(30))),
+    );
+
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: SizedBox(
@@ -68,7 +71,7 @@ class _SettingsPageState extends State<SettingsPage> {
               key: _formKey,
               child: Column(
                 children: <Widget>[
-                  emailField,
+                  passwordField,
                   const SizedBox(
                     height: 30,
                   ),
@@ -96,7 +99,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             textStyle: const TextStyle(fontSize: 20),
                           ),
                           onPressed: () {
-                            resetPassword();
+                            changePassword(passwordController.text.trim());
                           },
                           child: const Text('Change password'),
                         ),
@@ -111,11 +114,13 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
-
-  Future resetPassword() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    await FirebaseAuth.instance.sendPasswordResetEmail(email: emailEditingController.text);
-
-    Fluttertoast.showToast(msg: "Email has been sent to reset password");
+  void changePassword(String password) async{
+    User user = FirebaseAuth.instance.currentUser!;
+   
+    user.updatePassword(password).then((_){
+      Fluttertoast.showToast(msg: "Password changed successfully");
+    }).catchError((error){
+      Fluttertoast.showToast(msg: "Oops, something went wrong");
+    });
   }
 }
