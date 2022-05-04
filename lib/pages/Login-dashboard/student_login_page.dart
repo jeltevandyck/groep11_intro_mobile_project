@@ -161,17 +161,19 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
         floatingActionButton: SizedBox(
           height: 40,
           width: 150,
-          child: FloatingActionButton(
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 10.0),
+            child: FloatingActionButton(
               child: const Text("Login as admin"),
               shape:
-                  const BeveledRectangleBorder(borderRadius: BorderRadius.zero),
+                  BeveledRectangleBorder(borderRadius: BorderRadius.circular(4)),
               onPressed: () {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => const AdminLoginPage()));
               }),
-        ),
+          )),
         appBar: AppBar(
           title: const Text("Student Login"),
         ),
