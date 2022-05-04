@@ -15,7 +15,7 @@ class CreateExamPage extends StatefulWidget {
 class _CreateExamPageState extends State<CreateExamPage> {
   final _auth = FirebaseAuth.instance;
 
-  final TextEditingController examNameControler = TextEditingController();
+  final TextEditingController examNameController = TextEditingController();
   List<ExamModel> exams = [];
 
   @override
@@ -26,50 +26,95 @@ class _CreateExamPageState extends State<CreateExamPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: showExamData(),
-    );
+        body: StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection("exams").snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return const Center(child: Text('Error loading documents'));
+        } else if (!snapshot.hasData) {
+          return createExamButton();
+        } else {
+          QueryDocumentSnapshot<Object?>? documentSnapshot =
+              snapshot.data?.docs.first;
+          return Center(
+            child: Container(
+              height: 150,
+              width: 500,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: const Color.fromRGBO(255, 255, 255, 0.8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                  ),
+                ],
+              ),
+              child: Column(
+                children: <Widget>[
+                  const SizedBox(height: 10),
+                  Text(
+                    (documentSnapshot != null)
+                        ? (documentSnapshot["name"])
+                        : "",
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w100,
+                      fontFamily: "Varela",
+                      color: Colors.black,
+                    ),
+                  ),
+                  OutlinedButton(
+                    style: TextButton.styleFrom(
+                      primary: Colors.red,
+                      padding: const EdgeInsets.all(20),
+                    ),
+                    child: const Text("Edit"),
+                    onPressed: () {},
+                  ),
+                  ElevatedButton(
+                    style: TextButton.styleFrom(
+                      primary: Colors.red,
+                      padding: const EdgeInsets.all(20),
+                    ),
+                    child: const Text("Remove",
+                        style: TextStyle(color: Colors.white)),
+                    onPressed: () {},
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+      },
+    ));
   }
 
-  Widget showExamData() {
-    if (exams.isEmpty) {
-      return Center(
-        child: TextButton(
-          onPressed: () {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return createDialog();
-                });
-          },
-          child: const Text('Create Exam'),
-          style: OutlinedButton.styleFrom(
-            primary: Colors.red,
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-          ),
+  Widget createExamButton() {
+    return Center(
+      child: TextButton(
+        onPressed: () {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return createDialog();
+              });
+        },
+        child: const Text('Create Exam'),
+        style: OutlinedButton.styleFrom(
+          primary: Colors.red,
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
         ),
-      );
-    } else {
-      return Center(
-        child: ListView.builder(
-            itemCount: exams.length,
-            itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                title: Text(exams[index].name ?? 'No name'),
-                onTap: () {
-                  Navigator.of(context)
-                      .pushNamed('/exam', arguments: exams[index]);
-                },
-              );
-            }),
-      );
-    }
+      ),
+    );
   }
 
   Widget createDialog() {
     final examNameField = TextField(
       autofocus: false,
-      controller: examNameControler,
       keyboardType: TextInputType.text,
+      controller: examNameController,
       decoration: InputDecoration(
           fillColor: Colors.white,
           filled: true,
@@ -91,31 +136,18 @@ class _CreateExamPageState extends State<CreateExamPage> {
         TextButton(
           child: const Text('Cancel'),
           onPressed: () {
-            Navigator.of(context).pop();
+            //Navigator.of(context).pop();
           },
         ),
         TextButton(
           child: const Text('Create', style: TextStyle(color: Colors.green)),
           onPressed: () {
             pushExamToDatabase();
-            Navigator.of(context).pop();
+            //Navigator.of(context).pop();
           },
         ),
       ],
     );
-  }
-
-  popExamsFromDatabase() async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    List<ExamModel> examsList = [];
-
-    //get exammodels from firebase
-    QuerySnapshot querySnapshot = await firestore.collection('exams').get();
-    querySnapshot.docs.forEach((doc) {
-      examsList.add(ExamModel.fromMap(doc.data()));
-    });
-
-    return examsList;
   }
 
   pushExamToDatabase() async {
@@ -126,7 +158,7 @@ class _CreateExamPageState extends State<CreateExamPage> {
     await firestore
         .collection('exams')
         .doc()
-        .set({'name': examNameControler.text});
+        .set({'name': examNameController.text});
 
     Fluttertoast.showToast(msg: 'Exam added');
   }

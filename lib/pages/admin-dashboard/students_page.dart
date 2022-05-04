@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:csv/csv.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -50,8 +48,8 @@ class _StudentsPageState extends State<StudentsPage> {
       studentModel.fullName = students[i].fullName;
 
       await firebaseFirestore
-      .doc(studentModel.accountNumber)
-      .set(studentModel.toMap());
+          .doc(studentModel.accountNumber)
+          .set(studentModel.toMap());
     }
     print("upload succesfull");
   }
@@ -96,15 +94,12 @@ class _StudentsPageState extends State<StudentsPage> {
                               ? (documentSnapshot["fullName"])
                               : ""),
                         ),
-                      )
-                    );
+                      ));
                 },
               );
             }
             return const Text("temp");
           },
-        )
-      );
+        ));
   }
-
 }
