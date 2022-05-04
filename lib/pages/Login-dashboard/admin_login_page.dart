@@ -3,24 +3,23 @@ import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:groep11_intro_mobile_project/pages/admin-dashboard/create_student_page.dart';
+import 'package:groep11_intro_mobile_project/pages/admin-dashboard/admin_dashboard_page.dart';
+import 'package:groep11_intro_mobile_project/pages/admin-dashboard/create_exam_page.dart';
 
-import 'admin_login_page.dart';
-
-class StudentLoginPage extends StatefulWidget {
-  const StudentLoginPage({Key? key}) : super(key: key);
+class AdminLoginPage extends StatefulWidget {
+  const AdminLoginPage({Key? key}) : super(key: key);
 
   @override
-  State<StudentLoginPage> createState() => _StudentLoginPageState();
+  State<AdminLoginPage> createState() => _AdminLoginPageState();
 }
 
-class _StudentLoginPageState extends State<StudentLoginPage> {
+class _AdminLoginPageState extends State<AdminLoginPage> {
   final _formKey = GlobalKey<FormState>();
-
-  final _auth = FirebaseAuth.instance;
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  final _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -44,9 +43,35 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
       decoration: InputDecoration(
           fillColor: Colors.white,
           filled: true,
-          prefixIcon: const Icon(Icons.account_circle),
+          prefixIcon: const Icon(Icons.mail),
           contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
           hintText: 'Email',
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(30))),
+    );
+    final passwordField = TextFormField(
+      autofocus: false,
+      controller: passwordController,
+      validator: (value) {
+        RegExp regexp = RegExp(r'^.{6,}$');
+        if (value!.isEmpty) {
+          return ("Please enter your password.");
+        }
+        if (!regexp.hasMatch(value)) {
+          return ('Please enter a valid password.');
+        }
+        return null;
+      },
+      onSaved: (value) {
+        passwordController.text = value!;
+      },
+      obscureText: true,
+      textInputAction: TextInputAction.done,
+      decoration: InputDecoration(
+          fillColor: Colors.white,
+          filled: true,
+          prefixIcon: const Icon(Icons.vpn_key),
+          contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+          hintText: 'Password',
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(30))),
     );
 
@@ -54,39 +79,15 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
         elevation: 5,
         borderRadius: BorderRadius.circular(30),
         color: Colors.red,
-        child: Container(
+        child: SizedBox(
           width: 200,
           child: MaterialButton(
             padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             minWidth: MediaQuery.of(context).size.width,
             onPressed: () {
-              signIn(emailController.text);
+              signIn(emailController.text, passwordController.text);
             },
             child: const Text('Login',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Colors.white)),
-          ),
-        ));
-
-    final adminButton = Material(
-        elevation: 5,
-        borderRadius: BorderRadius.circular(30),
-        color: Colors.red,
-        child: Container(
-          width: 200,
-          child: MaterialButton(
-            padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-            minWidth: MediaQuery.of(context).size.width,
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const AdminLoginPage()));
-            },
-            child: const Text('Login as admin',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -107,6 +108,23 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
         child: Container(
           decoration: BoxDecoration(color: Colors.white.withOpacity(0.0)),
           child: Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              leading: IconButton(
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.red,
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              title: const Text(
+                "Student login",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                textAlign: TextAlign.center,
+              ),
+            ),
             backgroundColor: Colors.transparent,
             body: Center(
               child: SingleChildScrollView(
@@ -118,13 +136,13 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                       children: <Widget>[
                         emailField,
                         const SizedBox(
-                          height: 90,
+                          height: 30,
                         ),
-                        loginButton,
+                        passwordField,
                         const SizedBox(
                           height: 60,
                         ),
-                        adminButton
+                        loginButton
                       ],
                     ),
                   ),
@@ -142,11 +160,16 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
     );
   }
 
-  void signIn(String email) async {
+  void signIn(String email, String password) async {
     if (_formKey.currentState!.validate()) {
       await _auth
-          .signInWithEmailAndPassword(email: email, password: "default")
+          .signInWithEmailAndPassword(email: email, password: password)
           .then((uid) => Fluttertoast.showToast(msg: "Login Succesful"));
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const AdminDashboardPage()),
+      );
     }
   }
 }
