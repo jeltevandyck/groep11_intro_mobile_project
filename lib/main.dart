@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:groep11_intro_mobile_project/pages/Login-dashboard/student_login_page.dart';
+import 'package:groep11_intro_mobile_project/pages/student-dashboard/start_exam_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Login page',
       theme: ThemeData(primarySwatch: Colors.red),
-      home: const CreateExamPage(),
+      home: const StartExamPage(),
     );
   }
 }
