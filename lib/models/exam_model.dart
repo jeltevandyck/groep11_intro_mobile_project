@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:groep11_intro_mobile_project/models/user_model.dart';
 
 class ExamModel {
   String? uid;

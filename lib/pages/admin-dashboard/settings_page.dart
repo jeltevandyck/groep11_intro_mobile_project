@@ -51,12 +51,10 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Container(
             margin: const EdgeInsets.only(bottom: 10.0),
             child: FloatingActionButton(
-              child: const Text("Log out"),
-              shape:
-                  BeveledRectangleBorder(borderRadius: BorderRadius.circular(4)),
-              onPressed: () {
-                logOut();
-              }),
+                child: const Text("Log Out"),
+                onPressed: () {
+                  logOut();
+                }),
           )),
       appBar: AppBar(
         automaticallyImplyLeading: false,
