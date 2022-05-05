@@ -230,6 +230,8 @@ class _CreateStudentPageState extends State<CreateStudentPage> {
     }
   }
 
+
+//Moet aangepast worden aangezien datamodel is aangepast als het zou gebruikt worden
   postDetailsToFirestore() async {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     User? user = _auth.currentUser;
