@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class StudentExamModel {
-  String? examId;
+  String? uid;
   String? userId;
-  Timestamp? latitude;
-  Timestamp? longitude;
+  String? latitude;
+  String? longitude;
 
   StudentExamModel({
-    this.examId,
+    this.uid,
     this.userId,
     this.latitude,
     this.longitude,
@@ -15,7 +15,7 @@ class StudentExamModel {
 
   factory StudentExamModel.fromMap(map) {
     return StudentExamModel(
-      examId: map['examId'],
+      uid: map['uid'],
       userId: map['userId'],
       latitude: map['latitude'],
       longitude: map['longitude'],
@@ -24,7 +24,7 @@ class StudentExamModel {
 
   Map<String, dynamic> toMap() {
     return {
-      'examId': examId,
+      'uid': uid,
       'userId': userId,
       'latitude': latitude,
       'longitude': longitude,

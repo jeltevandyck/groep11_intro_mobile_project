@@ -3,7 +3,9 @@ import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:groep11_intro_mobile_project/pages/student-dashboard/start_exam_page.dart';
 
 import 'admin_login_page.dart';
 
@@ -122,6 +124,9 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                       itemBuilder: (BuildContext context, int index) {
                         QueryDocumentSnapshot<Object?>? documentSnapshot =
                             snapshot.data?.docs[index];
+                        String temp = (documentSnapshot != null)
+                                    ? (documentSnapshot["accountNumber"])
+                                    : "";
                         return Dismissible(
                             key: Key(index.toString()),
                             child: Card(
@@ -134,9 +139,9 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                                     ? (documentSnapshot["fullName"])
                                     : ""),
                                 onTap: () => {
-                                  print((documentSnapshot != null)
-                                      ? (documentSnapshot["accountNumber"])
-                                      : "")
+                                      Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => StartExamPage(accountNr: temp)))
                                 },
                               ),
                             ));
