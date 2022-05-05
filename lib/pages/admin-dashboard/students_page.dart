@@ -19,6 +19,42 @@ class _StudentsPageState extends State<StudentsPage> {
   final _formKey = GlobalKey<FormState>();
   List<StudentModel> students = [];
 
+  loadCSV(filePath) async {
+    final myData = await rootBundle.loadString(filePath);
+    List<List<dynamic>> csvTable = const CsvToListConverter().convert(myData);
+    List<StudentModel> data = [];
+    for (var row in csvTable) {
+      for (var studentData in row) {
+        final splittedValue = studentData.split(';');
+        StudentModel studentModel = StudentModel();
+        studentModel.accountNumber = splittedValue[0];
+        studentModel.fullName = splittedValue[1];
+        data.add(studentModel);
+      }
+    }
+    students = data;
+    uploadCSVToFirebase(students);
+  }
+
+  uploadCSVToFirebase(List<StudentModel> students) async {
+    StudentModel studentModel = StudentModel();
+    var firebaseFirestore = FirebaseFirestore.instance.collection("students");
+    var snapshots = await firebaseFirestore.get();
+    for (var doc in snapshots.docs) {
+      await doc.reference.delete();
+    }
+
+    for (var i = 1; i < students.length; i++) {
+      studentModel.accountNumber = students[i].accountNumber;
+      studentModel.fullName = students[i].fullName;
+
+      await firebaseFirestore
+          .doc(studentModel.accountNumber)
+          .set(studentModel.toMap());
+    }
+    print("upload succesfull");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
