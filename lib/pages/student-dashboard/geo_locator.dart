@@ -1,31 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
 class TestPage extends StatefulWidget {
-  const TestPage({Key? key}) : super(key: key);
-
   @override
-  _TestPageState createState() => _TestPageState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _TestPageState extends State<TestPage> {
+class _HomePageState extends State<TestPage> {
   Position? _currentPosition;
+  String? _currentAddress;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Location"),
+        title: Text("Location"),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            if (_currentPosition != null) Text(
-              "LAT: ${_currentPosition?.latitude}, LNG: ${_currentPosition?.longitude}"
+            if (_currentAddress != null) Text(
+              _currentAddress!
             ),
-            TextButton(
-              child: const Text("Get location"),
+            FlatButton(
+              child: Text("Get location"),
               onPressed: () {
                 _getCurrentLocation();
               },
@@ -42,11 +42,27 @@ class _TestPageState extends State<TestPage> {
       .then((Position position) {
         setState(() {
           _currentPosition = position;
+          _getAddressFromLatLng();
         });
       }).catchError((e) {
         print(e);
       });
   }
 
-  
+  _getAddressFromLatLng() async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        _currentPosition!.latitude,
+        _currentPosition!.longitude
+      );
+
+      Placemark place = placemarks[0];
+
+      setState(() {
+        _currentAddress = "${place.locality}, ${place.postalCode}, ${place.country}";
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
 }

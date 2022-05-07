@@ -46,8 +46,8 @@ class _SettingsPageState extends State<SettingsPage> {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: SizedBox(
-          height: 40,
-          width: 80,
+          height: 100,
+            width: 120,
           child: Container(
             margin: const EdgeInsets.only(bottom: 10.0),
             child: FloatingActionButton(

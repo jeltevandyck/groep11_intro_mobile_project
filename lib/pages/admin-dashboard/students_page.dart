@@ -17,6 +17,11 @@ class _StudentsPageState extends State<StudentsPage> {
   final _auth = FirebaseAuth.instance;
 
   final _formKey = GlobalKey<FormState>();
+
+  String studentScore = "20";
+
+  String? currentAddress;
+
   List<StudentModel> students = [];
 
   loadCSV(filePath) async {
@@ -52,7 +57,6 @@ class _StudentsPageState extends State<StudentsPage> {
           .doc(studentModel.accountNumber)
           .set(studentModel.toMap());
     }
-    print("upload succesfull");
   }
 
   @override
@@ -78,7 +82,6 @@ class _StudentsPageState extends State<StudentsPage> {
           automaticallyImplyLeading: false,
           title: const Text("Students"),
           centerTitle: true,
-          
         ),
         body: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance.collection("students").snapshots(),
@@ -103,13 +106,205 @@ class _StudentsPageState extends State<StudentsPage> {
                           subtitle: Text((documentSnapshot != null)
                               ? (documentSnapshot["fullName"])
                               : ""),
+                          onTap: () {
+                            showStudentInformation(
+                                documentSnapshot!["accountNumber"],
+                                (documentSnapshot["fullName"]));
+                          },
                         ),
                       ));
                 },
               );
             }
-            return const Text("temp");
+            return const Text("No students available");
           },
         ));
+  }
+
+  void showScoreChange() {
+    final TextEditingController scoreController = TextEditingController();
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              insetPadding: EdgeInsets.zero,
+              content: Builder(
+                builder: (context) {
+                  // Get available height and width of the build area of this widget. Make a choice depending on the size.
+                  var height = MediaQuery.of(context).size.height;
+                  var width = MediaQuery.of(context).size.width;
+
+                  return SizedBox(
+                      height: (height/100)*20,
+                      width: (width/100)*20,
+                      child: Scaffold(
+                          body: Column(
+                        children: [
+                          TextField(
+                            controller: scoreController,
+                            onChanged: (value) {
+                              scoreController.text = value;
+                            },
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(), hintText: "New Score"),
+                          ),
+                          TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  studentScore = scoreController.text;
+                                });
+                                Navigator.pop(context);
+                              },
+                              child: const Text("edit"))
+                        ],
+                      )));
+                },
+              ));
+        });
+  }
+
+  void showStudentInformation(accountNr, fullname) {
+    final editButton = Material(
+        elevation: 5,
+        borderRadius: BorderRadius.circular(30),
+        color: Colors.red,
+        child: SizedBox(
+          width: 200,
+          child: MaterialButton(
+            padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+            minWidth: MediaQuery.of(context).size.width,
+            onPressed: () {
+              showScoreChange();
+            },
+            child: const Text('Edit',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Colors.white)),
+          ),
+        ));
+    final answersButton = Material(
+        elevation: 5,
+        borderRadius: BorderRadius.circular(30),
+        color: Colors.red,
+        child: SizedBox(
+          width: 200,
+          child: MaterialButton(
+            padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+            minWidth: MediaQuery.of(context).size.width,
+            onPressed: () {
+              print("temp");
+            },
+            child: const Text('Answers',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Colors.white)),
+          ),
+        ));
+    final locationButton = Material(
+        elevation: 5,
+        borderRadius: BorderRadius.circular(30),
+        color: Colors.red,
+        child: SizedBox(
+          width: 200,
+          child: MaterialButton(
+            padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+            minWidth: MediaQuery.of(context).size.width,
+            onPressed: () {
+              print("temp");
+            },
+            child: const Text('Location',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Colors.white)),
+          ),
+        ));
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              insetPadding: EdgeInsets.zero,
+              content: Builder(
+                builder: (context) {
+                  // Get available height and width of the build area of this widget. Make a choice depending on the size.
+                  var height = MediaQuery.of(context).size.height;
+                  var width = MediaQuery.of(context).size.width;
+
+                  return SizedBox(
+                      height: height - 400,
+                      width: width - 400,
+                      child: Scaffold(
+                          appBar: AppBar(
+                            automaticallyImplyLeading: true,
+                            title: Text("$fullname ($accountNr)"),
+                            centerTitle: true,
+                          ),
+                          body: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text("Score: $studentScore"),
+                                  TextButton(
+                                      onPressed: () {
+                                        showScoreChange();
+                                        //update score after checking open questions
+                                      },
+                                      child: const Text("Edit"))
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: const [
+                                  Text("the student closed the exam 3 times")
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  answersButton,
+                                  locationButton,
+                                ],
+                              )
+                            ],
+                          )));
+                },
+              ));
+        });
+  }
+
+  // getAddressFromLatLng(String latitude, String longitude) async {
+  //   try {
+  //     List<Placemark> placemarks = await placemarkFromCoordinates(
+  //       double.parse(latitude),
+  //       double.parse(longitude)
+  //     );
+
+  //     Placemark place = placemarks[0];
+
+  //     setState(() {
+  //       currentAddress = "${place.locality}, ${place.postalCode}, ${place.country}";
+  //     });
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
+
+  //Hier was ik
+  void getStudentExam(accountNr) async {
+    QuerySnapshot collection = await FirebaseFirestore.instance
+        .collection("student_exams")
+        .where("userId", isEqualTo: accountNr)
+        .get();
+
+    print(collection.docs.first["uid"]);
   }
 }
