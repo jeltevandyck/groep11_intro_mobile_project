@@ -150,9 +150,7 @@ class _StudentsPageState extends State<StudentsPage> {
                           ),
                           TextButton(
                               onPressed: () {
-                                setState(() {
-                                  studentScore = scoreController.text;
-                                });
+                                //Update student score
                                 Navigator.pop(context);
                               },
                               child: const Text("edit"))

@@ -73,7 +73,7 @@ class _StartExamPageState extends State<StartExamPage> {
       uploadStudentExamToFirebase(uid, position.longitude, position.latitude);
     }).catchError((e) {
       print(e);
-    });
+  });
 
     Navigator.push(
       context,

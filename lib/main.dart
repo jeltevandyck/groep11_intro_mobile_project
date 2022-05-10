@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:groep11_intro_mobile_project/models/student_exam_model.dart';
 import 'package:groep11_intro_mobile_project/pages/Login-dashboard/student_login_page.dart';
 import 'package:groep11_intro_mobile_project/pages/admin-dashboard/students_page.dart';
-import 'package:groep11_intro_mobile_project/pages/student-dashboard/geo_locator.dart';
 import 'package:groep11_intro_mobile_project/pages/student-dashboard/start_exam_page.dart';
 
 Future<void> main() async {
