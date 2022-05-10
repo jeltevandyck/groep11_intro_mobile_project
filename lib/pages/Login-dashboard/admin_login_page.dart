@@ -161,14 +161,17 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
 
   void signIn(String email, String password) async {
     if (_formKey.currentState!.validate()) {
-      await _auth
+      try {
+        await _auth
           .signInWithEmailAndPassword(email: email, password: password)
           .then((uid) => Fluttertoast.showToast(msg: "Login Succesful"));
-
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const AdminDashboardPage()),
       );
+      } catch(e) {
+        Fluttertoast.showToast(msg: "Please enter a valid login");
+      }
     }
   }
 }
