@@ -17,7 +17,7 @@ class _QuestionPageState extends State<QuestionPage> {
     return Scaffold(
         appBar: AppBar(
           title: const Text('Vraag'),
-          automaticallyImplyLeading: false,
+          automaticallyImplyLeading: true,
         ),
         body: Center(
           child: Text(

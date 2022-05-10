@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:groep11_intro_mobile_project/pages/admin-dashboard/settings_page.dart';
 
 import 'create_exam_page.dart';
 import 'students_page.dart';
@@ -12,10 +13,13 @@ class AdminDashboardPage extends StatefulWidget {
 
 class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
+  final TextEditingController emailController =
+      TextEditingController();
   int currentindex=0;
   final pages = [
     const CreateExamPage(),
-    const StudentsPage()
+    const StudentsPage(),
+    const SettingsPage()
   ];
 
   @override

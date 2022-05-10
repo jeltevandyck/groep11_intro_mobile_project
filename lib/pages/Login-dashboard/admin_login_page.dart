@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:groep11_intro_mobile_project/pages/admin-dashboard/admin_dashboard_page.dart';
-import 'package:groep11_intro_mobile_project/pages/admin-dashboard/create_exam_page.dart';
 
 class AdminLoginPage extends StatefulWidget {
   const AdminLoginPage({Key? key}) : super(key: key);
@@ -162,14 +161,17 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
 
   void signIn(String email, String password) async {
     if (_formKey.currentState!.validate()) {
-      await _auth
+      try {
+        await _auth
           .signInWithEmailAndPassword(email: email, password: password)
           .then((uid) => Fluttertoast.showToast(msg: "Login Succesful"));
-
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const AdminDashboardPage()),
       );
+      } catch(e) {
+        Fluttertoast.showToast(msg: "Please enter a valid login");
+      }
     }
   }
 }
