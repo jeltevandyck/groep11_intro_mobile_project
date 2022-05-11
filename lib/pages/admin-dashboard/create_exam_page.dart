@@ -152,8 +152,6 @@ class _CreateExamPageState extends State<CreateExamPage> {
 
   pushExamToDatabase() async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
-    //create uuid
-    String uuid = const Uuid().v4();
 
     await firestore
         .collection('exams')
