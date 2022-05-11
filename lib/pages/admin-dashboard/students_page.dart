@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:groep11_intro_mobile_project/models/student_model.dart';
 import 'package:groep11_intro_mobile_project/pages/admin-dashboard/add_students_page.dart';
+import 'package:groep11_intro_mobile_project/pages/admin-dashboard/location_page.dart';
 
 class StudentsPage extends StatefulWidget {
   const StudentsPage({Key? key}) : super(key: key);
@@ -109,7 +110,7 @@ class _StudentsPageState extends State<StudentsPage> {
                           onTap: () {
                             showStudentInformation(
                                 documentSnapshot!["accountNumber"],
-                                (documentSnapshot["fullName"]));
+                                documentSnapshot["fullName"]);
                           },
                         ),
                       ));
@@ -135,8 +136,8 @@ class _StudentsPageState extends State<StudentsPage> {
                   var width = MediaQuery.of(context).size.width;
 
                   return SizedBox(
-                      height: (height/100)*20,
-                      width: (width/100)*20,
+                      height: (height / 100) * 20,
+                      width: (width / 100) * 20,
                       child: Scaffold(
                           body: Column(
                         children: [
@@ -146,7 +147,8 @@ class _StudentsPageState extends State<StudentsPage> {
                               scoreController.text = value;
                             },
                             decoration: const InputDecoration(
-                              border: OutlineInputBorder(), hintText: "New Score"),
+                                border: OutlineInputBorder(),
+                                hintText: "New Score"),
                           ),
                           TextButton(
                               onPressed: () {
@@ -212,7 +214,7 @@ class _StudentsPageState extends State<StudentsPage> {
             padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             minWidth: MediaQuery.of(context).size.width,
             onPressed: () {
-              print("temp");
+              showLocation(accountNr);
             },
             child: const Text('Location',
                 textAlign: TextAlign.center,
@@ -279,30 +281,21 @@ class _StudentsPageState extends State<StudentsPage> {
         });
   }
 
-  // getAddressFromLatLng(String latitude, String longitude) async {
-  //   try {
-  //     List<Placemark> placemarks = await placemarkFromCoordinates(
-  //       double.parse(latitude),
-  //       double.parse(longitude)
-  //     );
-
-  //     Placemark place = placemarks[0];
-
-  //     setState(() {
-  //       currentAddress = "${place.locality}, ${place.postalCode}, ${place.country}";
-  //     });
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
-
   //Hier was ik
-  void getStudentExam(accountNr) async {
+  Future<QuerySnapshot<Object?>> getStudentExam(accountNr) async {
     QuerySnapshot collection = await FirebaseFirestore.instance
         .collection("student_exams")
         .where("userId", isEqualTo: accountNr)
         .get();
+      return collection;
+  }
 
-    print(collection.docs.first["uid"]);
+  void showLocation(accountNr) async {
+    QuerySnapshot collection = await FirebaseFirestore.instance
+        .collection("student_exams")
+        .where("userId", isEqualTo: accountNr)
+        .get();
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => LocationPage(lat: collection.docs.first["latitude"], lon: collection.docs.first["longitude"])));
   }
 }
