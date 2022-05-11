@@ -74,11 +74,16 @@ class _QuestionPageState extends State<QuestionPage> {
                           padding: const EdgeInsets.symmetric(vertical: 16.0),
                           child: ElevatedButton(
                             onPressed: () {
-                              uploadMultipleChoiceAnswer(defaultValue);
+                              uploadMultipleChoiceAnswer(
+                                  defaultValue,
+                                  widget.question.solution.toString(),
+                                  widget.questionid.toString(),
+                                  widget.accountNr.toString());
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => VragenExamPage(),
+                                    builder: (context) => VragenExamPage(
+                                        accountNr: widget.accountNr),
                                   ));
                             },
                             child: const Text('Submit'),
@@ -132,7 +137,8 @@ class _QuestionPageState extends State<QuestionPage> {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => VragenExamPage(),
+                                        builder: (context) => VragenExamPage(
+                                            accountNr: widget.accountNr),
                                       ));
                                 },
                                 child: const Text('Submit'),
@@ -168,13 +174,14 @@ class _QuestionPageState extends State<QuestionPage> {
                                 onPressed: () {
                                   uploadOpenAnswer(
                                       openController.text,
-                                      "0",
                                       widget.questionid.toString(),
                                       widget.accountNr.toString());
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => VragenExamPage(),
+                                        builder: (context) => VragenExamPage(
+                                          accountNr: widget.accountNr,
+                                        ),
                                       ));
                                 },
                                 child: const Text('Submit'),
@@ -185,16 +192,33 @@ class _QuestionPageState extends State<QuestionPage> {
                       )));
   }
 
-  uploadMultipleChoiceAnswer(String answer) {
-    print(answer);
+  uploadMultipleChoiceAnswer(
+      String answer, String solution, String questionid, String userId) async {
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    AnswerModel answerModel = AnswerModel();
+
+    if (answer == solution) {
+      answerModel.grade = "10";
+    } else {
+      answerModel.grade = "0";
+    }
+
+    answerModel.answer = answer + ";";
+
+    answerModel.questionId = questionid;
+    answerModel.userId = userId;
+
+    await firebaseFirestore
+        .collection("answers")
+        .doc()
+        .set(answerModel.toMap());
   }
 
-  uploadOpenAnswer(
-      String answer, String grade, String questionid, String userId) async {
+  uploadOpenAnswer(String answer, String questionid, String userId) async {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     AnswerModel answerModel = AnswerModel();
     answerModel.answer = answer + ";";
-    answerModel.grade = grade;
+    answerModel.grade = "0";
     answerModel.questionId = questionid;
     answerModel.userId = userId;
 
