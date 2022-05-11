@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:groep11_intro_mobile_project/models/student_model.dart';
 import 'package:groep11_intro_mobile_project/pages/admin-dashboard/add_students_page.dart';
+import 'package:groep11_intro_mobile_project/pages/admin-dashboard/answers_page.dart';
 import 'package:groep11_intro_mobile_project/pages/admin-dashboard/location_page.dart';
 
 class StudentsPage extends StatefulWidget {
@@ -150,12 +151,6 @@ class _StudentsPageState extends State<StudentsPage> {
                                 border: OutlineInputBorder(),
                                 hintText: "New Score"),
                           ),
-                          TextButton(
-                              onPressed: () {
-                                //Update student score
-                                Navigator.pop(context);
-                              },
-                              child: const Text("edit"))
                         ],
                       )));
                 },
@@ -164,26 +159,6 @@ class _StudentsPageState extends State<StudentsPage> {
   }
 
   void showStudentInformation(accountNr, fullname) {
-    final editButton = Material(
-        elevation: 5,
-        borderRadius: BorderRadius.circular(30),
-        color: Colors.red,
-        child: SizedBox(
-          width: 200,
-          child: MaterialButton(
-            padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-            minWidth: MediaQuery.of(context).size.width,
-            onPressed: () {
-              showScoreChange();
-            },
-            child: const Text('Edit',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Colors.white)),
-          ),
-        ));
     final answersButton = Material(
         elevation: 5,
         borderRadius: BorderRadius.circular(30),
@@ -194,7 +169,7 @@ class _StudentsPageState extends State<StudentsPage> {
             padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             minWidth: MediaQuery.of(context).size.width,
             onPressed: () {
-              print("temp");
+              showAnswers(accountNr);
             },
             child: const Text('Answers',
                 textAlign: TextAlign.center,
@@ -251,12 +226,6 @@ class _StudentsPageState extends State<StudentsPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text("Score: $studentScore"),
-                                  TextButton(
-                                      onPressed: () {
-                                        showScoreChange();
-                                        //update score after checking open questions
-                                      },
-                                      child: const Text("Edit"))
                                 ],
                               ),
                               Row(
@@ -297,5 +266,9 @@ class _StudentsPageState extends State<StudentsPage> {
         .get();
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => LocationPage(lat: collection.docs.first["latitude"], lon: collection.docs.first["longitude"])));
+  }
+  void showAnswers(accountNr) async {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => AnswersPage(accountNr: accountNr,)));
   }
 }
