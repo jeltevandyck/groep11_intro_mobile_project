@@ -45,6 +45,7 @@ dependencies:
   geocoding: ^2.0.4
   google_maps_flutter: ^2.1.4
   location: ^4.3.0
+  datetime_picker_formfield: ^2.0.0
 
 dev_dependencies:
   flutter_test:
