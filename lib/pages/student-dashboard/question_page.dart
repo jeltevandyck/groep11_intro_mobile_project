@@ -33,7 +33,7 @@ class _QuestionPageState extends State<QuestionPage> {
     print(_answers);
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Vraag'),
+          title: const Text('Question'),
           automaticallyImplyLeading: true,
         ),
         body: Center(
@@ -118,7 +118,7 @@ class _QuestionPageState extends State<QuestionPage> {
                                 textAlign: TextAlign.left,
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
-                                  hintText: 'Vul in',
+                                  hintText: 'Fill in',
                                   hintStyle: TextStyle(color: Colors.grey),
                                 ),
                               ),
@@ -141,7 +141,7 @@ class _QuestionPageState extends State<QuestionPage> {
                                             accountNr: widget.accountNr),
                                       ));
                                 },
-                                child: const Text('Submitt'),
+                                child: const Text('Submit'),
                               ),
                             ),
                           ],
@@ -152,7 +152,8 @@ class _QuestionPageState extends State<QuestionPage> {
                           children: <Widget>[
                             Padding(
                                 padding: const EdgeInsets.all(100),
-                                child: Text("Vraag ${widget.question.question}",
+                                child: Text(
+                                    "Question ${widget.question.question}",
                                     style: const TextStyle(fontSize: 40))),
                             SizedBox(
                               width: 350,
@@ -162,7 +163,7 @@ class _QuestionPageState extends State<QuestionPage> {
                                 textAlign: TextAlign.left,
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
-                                  hintText: 'Vul in',
+                                  hintText: 'Fill in',
                                   hintStyle: TextStyle(color: Colors.grey),
                                 ),
                               ),

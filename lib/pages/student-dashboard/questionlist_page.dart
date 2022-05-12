@@ -51,7 +51,7 @@ class _VragenExamPageState extends State<VragenExamPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Vragen'),
+        title: const Text('Questions'),
         automaticallyImplyLeading: false,
       ),
       body: Stack(children: [
@@ -97,7 +97,7 @@ class _VragenExamPageState extends State<VragenExamPage>
               onPressed: () {
                 _showMyDialog();
               },
-              child: const Text('Beëndig Examen'),
+              child: const Text('End Exam'),
               style: OutlinedButton.styleFrom(
                 primary: Colors.white,
                 padding:
@@ -118,10 +118,10 @@ class _VragenExamPageState extends State<VragenExamPage>
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Ben je zeker dat je de examen wilt beëindigen?'),
+          title: const Text('You sure you want to end the exam?'),
           actions: <Widget>[
             TextButton(
-              child: const Text('JA'),
+              child: const Text('YES'),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -131,7 +131,7 @@ class _VragenExamPageState extends State<VragenExamPage>
               },
             ),
             TextButton(
-              child: const Text('NEE'),
+              child: const Text('NO'),
               onPressed: () => Navigator.pop(context),
             ),
           ],
