@@ -109,4 +109,7 @@ class CreateExamModal extends StatelessWidget {
     _examId = docref.id;
     Fluttertoast.showToast(msg: 'Exam added');
   }
+
+  //create getter for examId
+  String get examId => examId;
 }
