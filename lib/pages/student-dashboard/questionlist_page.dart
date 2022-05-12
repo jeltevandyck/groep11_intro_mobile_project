@@ -12,13 +12,39 @@ class VragenExamPage extends StatefulWidget {
   State<VragenExamPage> createState() => _VragenExamPageState();
 }
 
-class _VragenExamPageState extends State<VragenExamPage> {
+class _VragenExamPageState extends State<VragenExamPage>
+    with WidgetsBindingObserver {
   List<QuestionModal> _questions = [];
   String _currentQuestionid = "";
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     getQuestions();
+  }
+
+  @override
+  initState() {
+    super.initState();
+    WidgetsBinding.instance?.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance?.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    final isBackground = state == AppLifecycleState.paused;
+
+    if (isBackground) {
+      print("App is in background");
+    } else {
+      print("App is in foreground");
+    }
   }
 
   @override

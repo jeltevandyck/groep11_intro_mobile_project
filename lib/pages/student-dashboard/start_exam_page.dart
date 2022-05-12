@@ -88,6 +88,7 @@ class _StartExamPageState extends State<StartExamPage> {
     studentExamModel.userId = widget.accountNr;
     studentExamModel.longitude = lon.toString();
     studentExamModel.latitude = lat.toString();
+    studentExamModel.exitCounter = "0";
 
     await firebaseFirestore
         .collection("student_exams")

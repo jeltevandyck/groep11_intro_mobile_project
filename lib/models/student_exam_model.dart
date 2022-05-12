@@ -5,12 +5,14 @@ class StudentExamModel {
   String? userId;
   String? latitude;
   String? longitude;
+  String? exitCounter;
 
   StudentExamModel({
     this.uid,
     this.userId,
     this.latitude,
     this.longitude,
+    this.exitCounter,
   });
 
   factory StudentExamModel.fromMap(map) {
@@ -19,6 +21,7 @@ class StudentExamModel {
       userId: map['userId'],
       latitude: map['latitude'],
       longitude: map['longitude'],
+      exitCounter: map['exitCounter'],
     );
   }
 
@@ -28,6 +31,7 @@ class StudentExamModel {
       'userId': userId,
       'latitude': latitude,
       'longitude': longitude,
+      'exitCounter': exitCounter,
     };
   }
 }
