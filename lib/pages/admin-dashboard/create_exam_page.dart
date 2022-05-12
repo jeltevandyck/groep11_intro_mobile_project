@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:groep11_intro_mobile_project/models/exam_model.dart';
 import 'package:groep11_intro_mobile_project/models/question_model.dart';
+import 'package:groep11_intro_mobile_project/pages/admin-dashboard/code_question_modal.dart';
+import 'package:groep11_intro_mobile_project/pages/admin-dashboard/create_exam_modal.dart';
+import 'package:groep11_intro_mobile_project/pages/admin-dashboard/open_question_modal.dart';
 import 'package:uuid/uuid.dart';
 
 class CreateExamPage extends StatefulWidget {
@@ -19,14 +22,6 @@ class _CreateExamPageState extends State<CreateExamPage> {
   final TextEditingController examNameController = TextEditingController();
   final TextEditingController startDateController = TextEditingController();
   final TextEditingController endDateController = TextEditingController();
-  final TextEditingController openQuestionModalController =
-      TextEditingController();
-  final TextEditingController MaxResultsController = TextEditingController();
-  final TextEditingController questionController = TextEditingController();
-  final TextEditingController codeQuestionController = TextEditingController();
-  final TextEditingController wrongQuestionController = TextEditingController();
-
-  bool isCaseSensitive = false;
 
   String? _examId = "";
 
@@ -104,29 +99,6 @@ class _CreateExamPageState extends State<CreateExamPage> {
                     child: const Text('Code')),
               ),
             ],
-          ),
-          Row(
-            children: [
-              Scaffold(
-                body: StreamBuilder<QuerySnapshot>(
-                  stream: FirebaseFirestore.instance
-                      .collection('questions')
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const Text('Loading...');
-                    } else {
-                      return ListView.builder(
-                          itemCount: snapshot.data?.docs.length,
-                          itemBuilder: (context, index) {
-                            final question = snapshot.data?.docs[index].data();
-                            return Text(question.toString());
-                          });
-                    }
-                  },
-                ),
-              )
-            ],
           )
         ]),
       );
@@ -155,254 +127,15 @@ class _CreateExamPageState extends State<CreateExamPage> {
   }
 
   Widget code_question_modal() {
-    return AlertDialog(
-      title: const Text('Code question'),
-      content: Container(
-        height: 500,
-        width: 500,
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: questionController,
-                decoration: const InputDecoration(
-                  labelText: 'Question',
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter some text';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: codeQuestionController,
-                decoration: const InputDecoration(
-                  labelText: 'Correct code',
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter some text';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: wrongQuestionController,
-                decoration: const InputDecoration(
-                  labelText: 'Wrong code',
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter some text';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: MaxResultsController,
-                decoration: const InputDecoration(
-                  labelText: 'Max results',
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter some text';
-                  }
-                  return null;
-                },
-              ),
-              Row(
-                children: [
-                  Checkbox(
-                      checkColor: Colors.white,
-                      value: isCaseSensitive,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          isCaseSensitive = value!;
-                        });
-                      }),
-                  const Text('Case sensitive'),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      await pushCodeQuestionToDatabase();
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: const Text('Create'),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    return CodeQuestionModal(_examId);
   }
 
   Widget open_question_modal() {
-    return AlertDialog(
-      title: const Text('Open vraag'),
-      content: Container(
-        height: 500,
-        width: 500,
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: openQuestionModalController,
-                decoration: const InputDecoration(
-                  labelText: 'Question',
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Question is empty';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  openQuestionModalController.text = value!;
-                },
-              ),
-              TextFormField(
-                controller: MaxResultsController,
-                decoration: const InputDecoration(
-                  labelText: 'Max results',
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Max results is empty';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  MaxResultsController.text = value!;
-                },
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: ElevatedButton(
-                    onPressed: () async {
-                      await pushOpenQuestionToDatabase();
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Create')),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
+    return OpenQuestionModal(_examId);
   }
 
   Widget create_exam_modal() {
-    return AlertDialog(
-      title: const Text('Create exam'),
-      content: SizedBox(
-        height: 400,
-        width: 500,
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: <Widget>[
-              const Text('Exam name'),
-              TextFormField(
-                  controller: examNameController,
-                  decoration: const InputDecoration(hintText: 'Exam name'),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter an exam name.';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    examNameController.text = value!;
-                  }),
-              const Text('Start date'),
-              TextFormField(
-                controller: startDateController,
-                decoration:
-                    const InputDecoration(hintText: 'yyyy-mm-dd hh:mm:ss'),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter a start date.';
-                  }
-                  if (!RegExp(r'(\d{4}-?\d\d-?\d\d(\s|T)\d\d:?\d\d:?\d\d)')
-                      .hasMatch(value)) {
-                    return 'year-mm-dd hh:mm:ss';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  startDateController.text = value!;
-                },
-              ),
-              const Text('End date'),
-              TextFormField(
-                controller: endDateController,
-                decoration:
-                    const InputDecoration(hintText: 'yyyy-mm-dd hh:mm:ss'),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'yyyy-mm-dd hh:mm:ss';
-                  }
-                  if (!RegExp(r'(\d{4}-?\d\d-?\d\d(\s|T)\d\d:?\d\d:?\d\d)')
-                      .hasMatch(value)) {
-                    return 'yyyy-mm-dd hh:mm:ss';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  endDateController.text = value!;
-                },
-                textInputAction: TextInputAction.done,
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  // Create exam
-                  if (_formKey.currentState!.validate()) {
-                    await pushExamToDatabase();
-
-                    Navigator.pop(context);
-                  }
-                },
-                child: const Text('Create'),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  pushOpenQuestionToDatabase() async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-    await firestore.collection('questions').doc().set({
-      "question": openQuestionModalController.text,
-      "max": int.parse(MaxResultsController.text),
-      "examType": 3,
-      "examId": _examId.toString()
-    });
-  }
-
-  pushCodeQuestionToDatabase() async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-    await firestore.collection('questions').doc().set({
-      "question": questionController.text,
-      "correctCode": codeQuestionController.text,
-      "wrongCode": wrongQuestionController.text,
-      "examType": 2,
-      "caseSensitive": isCaseSensitive,
-      "max": int.parse(MaxResultsController.text),
-    });
+    return CreateExamModal();
   }
 
   pushExamToDatabase() async {
