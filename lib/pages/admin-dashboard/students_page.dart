@@ -24,6 +24,8 @@ class _StudentsPageState extends State<StudentsPage> {
 
   String? currentAddress;
 
+  String _currentExitCounter = "";
+
   List<StudentModel> students = [];
 
   loadCSV(filePath) async {
@@ -158,7 +160,8 @@ class _StudentsPageState extends State<StudentsPage> {
         });
   }
 
-  void showStudentInformation(accountNr, fullname) {
+  void showStudentInformation(accountNr, fullname) async {
+    await getCurrentExitCounter(accountNr);
     final answersButton = Material(
         elevation: 5,
         borderRadius: BorderRadius.circular(30),
@@ -231,8 +234,8 @@ class _StudentsPageState extends State<StudentsPage> {
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
-                                children: const [
-                                  Text("the student closed the exam 3 times")
+                                children: [
+                                  Text("the student closed the exam ${_currentExitCounter} times")
                                 ],
                               ),
                               Row(
@@ -250,7 +253,14 @@ class _StudentsPageState extends State<StudentsPage> {
         });
   }
 
-  //Hier was ik
+  getCurrentExitCounter(accountNr) async {
+    QuerySnapshot collection = await FirebaseFirestore.instance
+        .collection("student_exams")
+        .where("userId", isEqualTo: accountNr)
+        .get();
+      setState(() => _currentExitCounter = collection.docs.first["exitCounter"]);
+  }
+
   Future<QuerySnapshot<Object?>> getStudentExam(accountNr) async {
     QuerySnapshot collection = await FirebaseFirestore.instance
         .collection("student_exams")
