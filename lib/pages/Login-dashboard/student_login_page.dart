@@ -3,7 +3,9 @@ import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:groep11_intro_mobile_project/pages/student-dashboard/start_exam_page.dart';
 
 import 'admin_login_page.dart';
 
@@ -122,24 +124,35 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                       itemBuilder: (BuildContext context, int index) {
                         QueryDocumentSnapshot<Object?>? documentSnapshot =
                             snapshot.data?.docs[index];
-                        return Dismissible(
-                            key: Key(index.toString()),
-                            child: Card(
-                              elevation: 5,
-                              child: ListTile(
-                                title: Text((documentSnapshot != null)
-                                    ? (documentSnapshot["accountNumber"])
-                                    : ""),
-                                subtitle: Text((documentSnapshot != null)
-                                    ? (documentSnapshot["fullName"])
-                                    : ""),
-                                onTap: () => {
-                                  print((documentSnapshot != null)
+                        String accountNr = (documentSnapshot != null)
+                            ? (documentSnapshot["accountNumber"])
+                            : "";
+                        String studentState = (documentSnapshot != null)
+                            ? (documentSnapshot["examDone"])
+                            : "";
+                        if (studentState == "false") {
+                          return Dismissible(
+                              key: Key(index.toString()),
+                              child: Card(
+                                elevation: 5,
+                                child: ListTile(
+                                  title: Text((documentSnapshot != null)
                                       ? (documentSnapshot["accountNumber"])
-                                      : "")
-                                },
-                              ),
-                            ));
+                                      : ""),
+                                  subtitle: Text((documentSnapshot != null)
+                                      ? (documentSnapshot["fullName"])
+                                      : ""),
+                                  onTap: () => {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => StartExamPage(
+                                                accountNr: accountNr)))
+                                  },
+                                ),
+                              ));
+                        }
+                        return const SizedBox.shrink();
                       },
                     );
                   } else {
@@ -157,19 +170,21 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
       child: Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
         floatingActionButton: SizedBox(
-          height: 40,
-          width: 150,
-          child: FloatingActionButton(
-              child: const Text("Login as admin"),
-              shape:
-                  const BeveledRectangleBorder(borderRadius: BorderRadius.zero),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const AdminLoginPage()));
-              }),
-        ),
+            height: 40,
+            width: 150,
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 10.0),
+              child: FloatingActionButton(
+                  child: const Text("Login as admin"),
+                  shape: BeveledRectangleBorder(
+                      borderRadius: BorderRadius.circular(4)),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AdminLoginPage()));
+                  }),
+            )),
         appBar: AppBar(
           title: const Text("Student Login"),
         ),

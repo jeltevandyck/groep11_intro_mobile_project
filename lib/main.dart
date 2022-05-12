@@ -1,11 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:groep11_intro_mobile_project/pages/Login-dashboard/student_login_page.dart';
-import 'package:groep11_intro_mobile_project/pages/admin-dashboard/create_exam_page.dart';
-import 'package:groep11_intro_mobile_project/pages/admin-dashboard/add_students_page.dart';
-import 'package:groep11_intro_mobile_project/pages/admin-dashboard/admin_dashboard_page.dart';
 import 'package:groep11_intro_mobile_project/pages/admin-dashboard/students_page.dart';
-import 'package:groep11_intro_mobile_project/pages/student-dashboard/start_exam_page.dart';
+import 'package:groep11_intro_mobile_project/pages/student-dashboard/questionlist_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +27,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Login page',
       theme: ThemeData(primarySwatch: Colors.red),
-      home: const StudentLoginPage(),
+      home: StudentLoginPage(),
     );
   }
 }

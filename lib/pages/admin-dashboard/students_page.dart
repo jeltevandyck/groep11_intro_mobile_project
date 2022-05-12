@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:groep11_intro_mobile_project/models/student_model.dart';
 import 'package:groep11_intro_mobile_project/pages/admin-dashboard/add_students_page.dart';
+import 'package:groep11_intro_mobile_project/pages/admin-dashboard/answers_page.dart';
+import 'package:groep11_intro_mobile_project/pages/admin-dashboard/location_page.dart';
 
 class StudentsPage extends StatefulWidget {
   const StudentsPage({Key? key}) : super(key: key);
@@ -17,6 +19,11 @@ class _StudentsPageState extends State<StudentsPage> {
   final _auth = FirebaseAuth.instance;
 
   final _formKey = GlobalKey<FormState>();
+
+  String studentScore = "20";
+
+  String? currentAddress;
+
   List<StudentModel> students = [];
 
   loadCSV(filePath) async {
@@ -52,7 +59,6 @@ class _StudentsPageState extends State<StudentsPage> {
           .doc(studentModel.accountNumber)
           .set(studentModel.toMap());
     }
-    print("upload succesfull");
   }
 
   @override
@@ -78,7 +84,6 @@ class _StudentsPageState extends State<StudentsPage> {
           automaticallyImplyLeading: false,
           title: const Text("Students"),
           centerTitle: true,
-          
         ),
         body: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance.collection("students").snapshots(),
@@ -103,13 +108,167 @@ class _StudentsPageState extends State<StudentsPage> {
                           subtitle: Text((documentSnapshot != null)
                               ? (documentSnapshot["fullName"])
                               : ""),
+                          onTap: () {
+                            showStudentInformation(
+                                documentSnapshot!["accountNumber"],
+                                documentSnapshot["fullName"]);
+                          },
                         ),
                       ));
                 },
               );
             }
-            return const Text("temp");
+            return const Text("No students available");
           },
         ));
+  }
+
+  void showScoreChange() {
+    final TextEditingController scoreController = TextEditingController();
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              insetPadding: EdgeInsets.zero,
+              content: Builder(
+                builder: (context) {
+                  // Get available height and width of the build area of this widget. Make a choice depending on the size.
+                  var height = MediaQuery.of(context).size.height;
+                  var width = MediaQuery.of(context).size.width;
+
+                  return SizedBox(
+                      height: (height / 100) * 20,
+                      width: (width / 100) * 20,
+                      child: Scaffold(
+                          body: Column(
+                        children: [
+                          TextField(
+                            controller: scoreController,
+                            onChanged: (value) {
+                              scoreController.text = value;
+                            },
+                            decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                hintText: "New Score"),
+                          ),
+                        ],
+                      )));
+                },
+              ));
+        });
+  }
+
+  void showStudentInformation(accountNr, fullname) {
+    final answersButton = Material(
+        elevation: 5,
+        borderRadius: BorderRadius.circular(30),
+        color: Colors.red,
+        child: SizedBox(
+          width: 200,
+          child: MaterialButton(
+            padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+            minWidth: MediaQuery.of(context).size.width,
+            onPressed: () {
+              showAnswers(accountNr);
+            },
+            child: const Text('Answers',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Colors.white)),
+          ),
+        ));
+    final locationButton = Material(
+        elevation: 5,
+        borderRadius: BorderRadius.circular(30),
+        color: Colors.red,
+        child: SizedBox(
+          width: 200,
+          child: MaterialButton(
+            padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+            minWidth: MediaQuery.of(context).size.width,
+            onPressed: () {
+              showLocation(accountNr);
+            },
+            child: const Text('Location',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Colors.white)),
+          ),
+        ));
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              insetPadding: EdgeInsets.zero,
+              content: Builder(
+                builder: (context) {
+                  // Get available height and width of the build area of this widget. Make a choice depending on the size.
+                  var height = MediaQuery.of(context).size.height;
+                  var width = MediaQuery.of(context).size.width;
+
+                  return SizedBox(
+                      height: height - 400,
+                      width: width - 400,
+                      child: Scaffold(
+                          appBar: AppBar(
+                            automaticallyImplyLeading: true,
+                            title: Text("$fullname ($accountNr)"),
+                            centerTitle: true,
+                          ),
+                          body: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text("Score: $studentScore"),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: const [
+                                  Text("the student closed the exam 3 times")
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  answersButton,
+                                  locationButton,
+                                ],
+                              )
+                            ],
+                          )));
+                },
+              ));
+        });
+  }
+
+  //Hier was ik
+  Future<QuerySnapshot<Object?>> getStudentExam(accountNr) async {
+    QuerySnapshot collection = await FirebaseFirestore.instance
+        .collection("student_exams")
+        .where("userId", isEqualTo: accountNr)
+        .get();
+      return collection;
+  }
+
+  void showLocation(accountNr) async {
+    QuerySnapshot collection = await FirebaseFirestore.instance
+        .collection("student_exams")
+        .where("userId", isEqualTo: accountNr)
+        .get();
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => LocationPage(lat: collection.docs.first["latitude"], lon: collection.docs.first["longitude"])));
+  }
+  void showAnswers(accountNr) async {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => AnswersPage(accountNr: accountNr,)));
   }
 }

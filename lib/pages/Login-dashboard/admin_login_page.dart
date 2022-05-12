@@ -84,7 +84,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
             padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             minWidth: MediaQuery.of(context).size.width,
             onPressed: () {
-              signIn(emailController.text, passwordController.text);
+              signIn(passwordController.text);
             },
             child: const Text('Login',
                 textAlign: TextAlign.center,
@@ -133,7 +133,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                     key: _formKey,
                     child: Column(
                       children: <Widget>[
-                        emailField,
+                        // emailField,
+                        const Text("Please enter your password", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35, color: Colors.red),),
                         const SizedBox(
                           height: 30,
                         ),
@@ -159,11 +160,11 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
     );
   }
 
-  void signIn(String email, String password) async {
+  void signIn(String password) async {
     if (_formKey.currentState!.validate()) {
       try {
         await _auth
-          .signInWithEmailAndPassword(email: email, password: password)
+          .signInWithEmailAndPassword(email: "admin@ap.be", password: password)
           .then((uid) => Fluttertoast.showToast(msg: "Login Succesful"));
       Navigator.push(
         context,
