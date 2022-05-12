@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -56,9 +54,7 @@ class _StartExamPageState extends State<StartExamPage> {
         } else {
           var documentSnapshot = snapshot.data?.docs.isNotEmpty;
           return Center(
-            child: documentSnapshot == true
-                ? c1(snapshot.data?.docs.first["uid"])
-                : c2,
+            child: documentSnapshot == true ? c1("test") : c2,
           );
         }
       },
@@ -73,22 +69,24 @@ class _StartExamPageState extends State<StartExamPage> {
       uploadStudentExamToFirebase(uid, position.longitude, position.latitude);
     }).catchError((e) {
       print(e);
-  });
+    });
 
+    String? accountNr = widget.accountNr;
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const VragenExamPage()),
+      MaterialPageRoute(
+          builder: (context) => VragenExamPage(accountNr: accountNr)),
     );
   }
 
   uploadStudentExamToFirebase(String uid, double lon, double lat) async {
-
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     StudentExamModel studentExamModel = StudentExamModel();
     studentExamModel.uid = uid;
     studentExamModel.userId = widget.accountNr;
     studentExamModel.longitude = lon.toString();
     studentExamModel.latitude = lat.toString();
+    studentExamModel.exitCounter = "0";
 
     await firebaseFirestore
         .collection("student_exams")

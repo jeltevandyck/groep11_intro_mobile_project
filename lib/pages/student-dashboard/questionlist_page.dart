@@ -1,23 +1,50 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:groep11_intro_mobile_project/models/question_model.dart';
-import 'package:groep11_intro_mobile_project/pages/student-dashboard/questionCard.dart';
 import 'package:groep11_intro_mobile_project/pages/student-dashboard/start_exam_page.dart';
+import 'question_page.dart';
 
 class VragenExamPage extends StatefulWidget {
-  const VragenExamPage({Key? key}) : super(key: key);
+  const VragenExamPage({this.accountNr, Key? key}) : super(key: key);
+  final String? accountNr;
 
   @override
   State<VragenExamPage> createState() => _VragenExamPageState();
 }
 
-class _VragenExamPageState extends State<VragenExamPage> {
+class _VragenExamPageState extends State<VragenExamPage>
+    with WidgetsBindingObserver {
   List<QuestionModal> _questions = [];
-
+  String _currentQuestionid = "";
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     getQuestions();
+  }
+
+  @override
+  initState() {
+    super.initState();
+    WidgetsBinding.instance?.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance?.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    final isBackground = state == AppLifecycleState.paused;
+
+    if (isBackground) {
+      print("App is in background");
+    } else {
+      print("App is in foreground");
+    }
   }
 
   @override
@@ -31,7 +58,36 @@ class _VragenExamPageState extends State<VragenExamPage> {
         ListView.builder(
             itemCount: _questions.length,
             itemBuilder: (context, index) {
-              return QuestionCard(_questions[index]);
+              return GestureDetector(
+                  onTap: () async {
+                    await getQuestionId(index);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QuestionPage(
+                            question: _questions[index],
+                            accountNr: widget.accountNr,
+                            questionid: _currentQuestionid,
+                            index: index,
+                          ),
+                        ));
+                  },
+                  child: Card(
+                    child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 10.0),
+                                  child: Text("${_questions[index].question}"),
+                                )
+                              ],
+                            )
+                          ],
+                        )),
+                  ));
             }),
         Align(
           alignment: Alignment.bottomCenter,
@@ -82,6 +138,14 @@ class _VragenExamPageState extends State<VragenExamPage> {
         );
       },
     );
+  }
+
+  getQuestionId(int index) async {
+    var data = await FirebaseFirestore.instance.collection('questions').get();
+    print(data.docs[index].id);
+    setState(() {
+      _currentQuestionid = data.docs[index].id;
+    });
   }
 
   Future getQuestions() async {
