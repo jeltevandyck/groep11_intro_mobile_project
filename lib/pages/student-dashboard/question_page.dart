@@ -1,3 +1,6 @@
+import 'dart:html';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:groep11_intro_mobile_project/models/answers_model.dart';
 import 'package:groep11_intro_mobile_project/models/question_model.dart';
@@ -6,10 +9,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:groep11_intro_mobile_project/pages/student-dashboard/questionlist_page.dart';
 
 class QuestionPage extends StatefulWidget {
-  const QuestionPage(
+  QuestionPage(
       {this.accountNr,
       this.questionid,
       this.index,
+      this.longitude,
+      this.latitude,
+      required this.counter,
       Key? key,
       required this.question})
       : super(key: key);
@@ -17,20 +23,69 @@ class QuestionPage extends StatefulWidget {
   final String? accountNr;
   final String? questionid;
   final num? index;
+  final double? longitude;
+  final double? latitude;
+  num counter;
+
   @override
   State<QuestionPage> createState() => _QuestionPageState();
 }
 
-class _QuestionPageState extends State<QuestionPage> {
+class _QuestionPageState extends State<QuestionPage>
+    with WidgetsBindingObserver {
   TextEditingController openController = TextEditingController();
   TextEditingController CompareController = TextEditingController();
 
   String defaultValue = "";
 
+  num count = 0;
+
+  @override
+  initState() {
+    super.initState();
+    count = widget.counter;
+
+    if (kIsWeb) {
+      window.addEventListener('focus', onFocus);
+      window.addEventListener('blur', onBlur);
+    } else {
+      WidgetsBinding.instance!.addObserver(this);
+    }
+  }
+
+  @override
+  void dispose() {
+    if (kIsWeb) {
+      window.removeEventListener('focus', onFocus);
+      window.removeEventListener('blur', onBlur);
+    } else {
+      WidgetsBinding.instance!.removeObserver(this);
+    }
+    super.dispose();
+  }
+
+  void onFocus(Event e) {
+    didChangeAppLifecycleState(AppLifecycleState.resumed);
+  }
+
+  void onBlur(Event e) {
+    didChangeAppLifecycleState(AppLifecycleState.paused);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    final isBackground = state == AppLifecycleState.paused;
+
+    if (isBackground) {
+      count++;
+    } else {}
+  }
+
   @override
   Widget build(BuildContext context) {
     List<String>? _answers = widget.question.answers?.split(";");
-    print(_answers);
     return Scaffold(
         appBar: AppBar(
           title: const Text('Vraag'),
@@ -83,7 +138,10 @@ class _QuestionPageState extends State<QuestionPage> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => VragenExamPage(
-                                        accountNr: widget.accountNr),
+                                        accountNr: widget.accountNr,
+                                        count: count,
+                                        longitude: widget.longitude,
+                                        latitude: widget.latitude),
                                   ));
                             },
                             child: const Text('Submit'),
@@ -138,10 +196,14 @@ class _QuestionPageState extends State<QuestionPage> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => VragenExamPage(
-                                            accountNr: widget.accountNr),
+                                          accountNr: widget.accountNr,
+                                          count: count,
+                                          longitude: widget.longitude,
+                                          latitude: widget.latitude,
+                                        ),
                                       ));
                                 },
-                                child: const Text('Submitt'),
+                                child: const Text('Submit'),
                               ),
                             ),
                           ],
@@ -172,6 +234,7 @@ class _QuestionPageState extends State<QuestionPage> {
                                   const EdgeInsets.symmetric(vertical: 16.0),
                               child: ElevatedButton(
                                 onPressed: () {
+                                  print(count);
                                   uploadOpenAnswer(
                                       openController.text,
                                       widget.questionid.toString(),
@@ -181,6 +244,9 @@ class _QuestionPageState extends State<QuestionPage> {
                                       MaterialPageRoute(
                                         builder: (context) => VragenExamPage(
                                           accountNr: widget.accountNr,
+                                          count: count,
+                                          longitude: widget.longitude,
+                                          latitude: widget.latitude,
                                         ),
                                       ));
                                 },

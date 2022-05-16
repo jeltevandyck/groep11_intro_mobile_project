@@ -1,12 +1,29 @@
+import 'dart:html';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:groep11_intro_mobile_project/models/answers_model.dart';
 import 'package:groep11_intro_mobile_project/models/question_model.dart';
+import 'package:groep11_intro_mobile_project/pages/Login-dashboard/student_login_page.dart';
 import 'package:groep11_intro_mobile_project/pages/student-dashboard/start_exam_page.dart';
+import '../../models/student_exam_model.dart';
 import 'question_page.dart';
 
 class VragenExamPage extends StatefulWidget {
-  const VragenExamPage({this.accountNr, Key? key}) : super(key: key);
+  const VragenExamPage(
+      {this.accountNr,
+      this.longitude,
+      this.latitude,
+      this.uid,
+      required this.count,
+      Key? key})
+      : super(key: key);
   final String? accountNr;
+  final num? count;
+  final double? longitude;
+  final double? latitude;
+  final String? uid;
 
   @override
   State<VragenExamPage> createState() => _VragenExamPageState();
@@ -16,6 +33,9 @@ class _VragenExamPageState extends State<VragenExamPage>
     with WidgetsBindingObserver {
   List<QuestionModal> _questions = [];
   String _currentQuestionid = "";
+
+  num counter = 0;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -25,13 +45,31 @@ class _VragenExamPageState extends State<VragenExamPage>
   @override
   initState() {
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
+    if (kIsWeb) {
+      window.addEventListener('focus', onFocus);
+      window.addEventListener('blur', onBlur);
+    } else {
+      WidgetsBinding.instance!.addObserver(this);
+    }
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance?.removeObserver(this);
+    if (kIsWeb) {
+      window.removeEventListener('focus', onFocus);
+      window.removeEventListener('blur', onBlur);
+    } else {
+      WidgetsBinding.instance!.removeObserver(this);
+    }
     super.dispose();
+  }
+
+  void onFocus(Event e) {
+    didChangeAppLifecycleState(AppLifecycleState.resumed);
+  }
+
+  void onBlur(Event e) {
+    didChangeAppLifecycleState(AppLifecycleState.paused);
   }
 
   @override
@@ -42,6 +80,7 @@ class _VragenExamPageState extends State<VragenExamPage>
 
     if (isBackground) {
       print("App is in background");
+      counter++;
     } else {
       print("App is in foreground");
     }
@@ -49,6 +88,13 @@ class _VragenExamPageState extends State<VragenExamPage>
 
   @override
   Widget build(BuildContext context) {
+    print(counter);
+    if (widget.count != null) {
+      counter = widget.count!;
+    }
+
+    print(widget.longitude);
+    print(widget.latitude);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Vragen'),
@@ -69,6 +115,9 @@ class _VragenExamPageState extends State<VragenExamPage>
                             accountNr: widget.accountNr,
                             questionid: _currentQuestionid,
                             index: index,
+                            counter: counter,
+                            longitude: widget.longitude,
+                            latitude: widget.latitude,
                           ),
                         ));
                   },
@@ -123,10 +172,11 @@ class _VragenExamPageState extends State<VragenExamPage>
             TextButton(
               child: const Text('JA'),
               onPressed: () {
+                updateStudentExam(counter);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const StartExamPage()),
+                      builder: (context) => const StudentLoginPage()),
                 );
               },
             ),
@@ -142,7 +192,6 @@ class _VragenExamPageState extends State<VragenExamPage>
 
   getQuestionId(int index) async {
     var data = await FirebaseFirestore.instance.collection('questions').get();
-    print(data.docs[index].id);
     setState(() {
       _currentQuestionid = data.docs[index].id;
     });
@@ -154,5 +203,26 @@ class _VragenExamPageState extends State<VragenExamPage>
       _questions =
           List.from(data.docs.map((doc) => QuestionModal.fromSnapshot(doc)));
     });
+  }
+
+  updateStudentExam(num? countss) async {
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    StudentExamModel studentExamModel = StudentExamModel();
+    studentExamModel.uid = widget.uid;
+    studentExamModel.userId = widget.accountNr;
+    studentExamModel.longitude = widget.longitude.toString();
+    studentExamModel.latitude = widget.latitude.toString();
+    studentExamModel.exitCounter = countss.toString();
+
+    print(studentExamModel.uid);
+    print(studentExamModel.userId);
+    print(studentExamModel.longitude);
+    print(studentExamModel.latitude);
+    print(studentExamModel.exitCounter);
+
+    await firebaseFirestore
+        .collection("student_exams")
+        .doc(studentExamModel.uid)
+        .set(studentExamModel.toMap());
   }
 }

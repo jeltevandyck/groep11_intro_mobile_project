@@ -14,7 +14,9 @@ class StartExamPage extends StatefulWidget {
 }
 
 class _StartExamPageState extends State<StartExamPage> {
-  // Position? currentPosition;
+  double? longitude;
+  double? latitude;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(body: startExam());
@@ -61,25 +63,31 @@ class _StartExamPageState extends State<StartExamPage> {
     ));
   }
 
-  getCurrentLocation(String uid) {
+  getCurrentLocation(String uid) async {
     Geolocator.getCurrentPosition(
             desiredAccuracy: LocationAccuracy.best,
             forceAndroidLocationManager: true)
         .then((Position position) {
-      uploadStudentExamToFirebase(uid, position.longitude, position.latitude);
+      longitude = position.longitude;
+      latitude = position.latitude;
+      uploadStudentExamToFirebase(uid, longitude, latitude);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => VragenExamPage(
+                  accountNr: widget.accountNr,
+                  count: 0,
+                  longitude: longitude,
+                  latitude: latitude,
+                  uid: uid,
+                )),
+      );
     }).catchError((e) {
       print(e);
     });
-
-    String? accountNr = widget.accountNr;
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => VragenExamPage(accountNr: accountNr)),
-    );
   }
 
-  uploadStudentExamToFirebase(String uid, double lon, double lat) async {
+  uploadStudentExamToFirebase(String uid, double? lon, double? lat) async {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     StudentExamModel studentExamModel = StudentExamModel();
     studentExamModel.uid = uid;
