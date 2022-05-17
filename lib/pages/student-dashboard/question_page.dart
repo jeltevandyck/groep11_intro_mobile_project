@@ -65,9 +65,8 @@ class _QuestionPageState extends State<QuestionPage>
     } else {
       WidgetsBinding.instance!.addObserver(this);
     }
-    print(widget.duration);
-    duration = widget.duration!;
 
+    duration = widget.duration!;
     startTimer();
   }
 
@@ -112,7 +111,7 @@ class _QuestionPageState extends State<QuestionPage>
             Text(
                 "${twoDigits(duration.inHours)}:${twoDigits(duration.inMinutes.remainder(60))}:${twoDigits(duration.inSeconds.remainder(60))}"),
           ]),
-          automaticallyImplyLeading: true,
+          automaticallyImplyLeading: false,
         ),
         body: Center(
             child: (widget.question.examType == 1)
@@ -205,7 +204,7 @@ class _QuestionPageState extends State<QuestionPage>
                                 textAlign: TextAlign.left,
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
-                                  hintText: 'Vul in',
+                                  hintText: 'Fill In',
                                   hintStyle: TextStyle(color: Colors.grey),
                                 ),
                               ),
@@ -258,7 +257,7 @@ class _QuestionPageState extends State<QuestionPage>
                                 textAlign: TextAlign.left,
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
-                                  hintText: 'Vul in',
+                                  hintText: 'Fill In',
                                   hintStyle: TextStyle(color: Colors.grey),
                                 ),
                               ),

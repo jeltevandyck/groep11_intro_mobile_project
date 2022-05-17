@@ -144,7 +144,7 @@ class _QuestionListPageState extends State<QuestionListPage>
                             longitude: widget.longitude,
                             latitude: widget.latitude,
                             uid: widget.uid,
-                            duration: duration,
+                            duration: widget.duration,
                             listAnswers: widget.listAnswers,
                           ),
                         ));
@@ -174,7 +174,7 @@ class _QuestionListPageState extends State<QuestionListPage>
               onPressed: () {
                 _showMyDialog();
               },
-              child: const Text('End Exam'),
+              child: const Text('Beëndig Examen'),
               style: OutlinedButton.styleFrom(
                 primary: Colors.white,
                 padding:
@@ -195,11 +195,16 @@ class _QuestionListPageState extends State<QuestionListPage>
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('You sure you want to end the exam?'),
+          title: const Text('Ben je zeker dat je de examen wilt beëindigen?'),
           actions: <Widget>[
             TextButton(
               child: const Text('JA'),
-              onPressed: () {
+              onPressed: () async {
+                endExam =
+                    ("${twoDigits(duration.inHours)}:${twoDigits(duration.inMinutes.remainder(60))}:${twoDigits(duration.inSeconds.remainder(60))}");
+                await updateStudentExam(counter);
+                await uploadExams(widget.listAnswers);
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -208,7 +213,7 @@ class _QuestionListPageState extends State<QuestionListPage>
               },
             ),
             TextButton(
-              child: const Text('NO'),
+              child: const Text('NEE'),
               onPressed: () => Navigator.pop(context),
             ),
           ],
