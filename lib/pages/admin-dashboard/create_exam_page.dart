@@ -94,7 +94,9 @@ class _CreateExamPageState extends State<CreateExamPage> {
                     onPressed: () {
                       showDialog(
                           context: context,
-                          builder: (context) => code_question_modal());
+                          builder: (context) {
+                            return CodeQuestionModal();
+                          });
                     },
                     child: const Text('Code')),
               ),
@@ -124,10 +126,6 @@ class _CreateExamPageState extends State<CreateExamPage> {
         }
       },
     ));
-  }
-
-  Widget code_question_modal() {
-    return CodeQuestionModal(_examId);
   }
 
   Widget open_question_modal() {

@@ -2,17 +2,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class CodeQuestionModal extends StatelessWidget {
-  String? examId;
+class CodeQuestionModal extends StatefulWidget {
+  CodeQuestionModal({Key? key}) : super(key: key);
 
-  CodeQuestionModal(this.examId);
+  String isCaseSensitive = 'No';
 
+  @override
+  State<CodeQuestionModal> createState() => _CodeQuestionModalState();
+}
+
+class _CodeQuestionModalState extends State<CodeQuestionModal> {
   final TextEditingController MaxResultsController = TextEditingController();
   final TextEditingController questionController = TextEditingController();
   final TextEditingController codeQuestionController = TextEditingController();
   final TextEditingController wrongQuestionController = TextEditingController();
-
-  bool isCaseSensitive = false;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -78,13 +81,25 @@ class CodeQuestionModal extends StatelessWidget {
               ),
               Row(
                 children: [
-                  Checkbox(
-                      checkColor: Colors.white,
-                      value: isCaseSensitive,
-                      onChanged: (bool? value) {
-                        isCaseSensitive = value!;
-                      }),
                   const Text('Case sensitive'),
+                  DropdownButton<String>(
+                    value: widget.isCaseSensitive,
+                    items: ['Yes', 'No'].map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (String? value) {
+                      setState(() {
+                        if (value == 'Yes') {
+                          widget.isCaseSensitive = 'Yes';
+                        } else {
+                          widget.isCaseSensitive = 'No';
+                        }
+                      });
+                    },
+                  ),
                 ],
               ),
               Padding(
@@ -114,7 +129,7 @@ class CodeQuestionModal extends StatelessWidget {
       "correctCode": codeQuestionController.text,
       "wrongCode": wrongQuestionController.text,
       "examType": 2,
-      "caseSensitive": isCaseSensitive,
+      "caseSensitive": widget.isCaseSensitive == 'Yes' ? true : false,
       "max": int.parse(MaxResultsController.text),
     });
   }
