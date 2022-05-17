@@ -43,6 +43,18 @@ dependencies:
   csv: ^5.0.1
   geolocator: ^8.2.1
   geocoding: ^2.0.4
+  flutter_map: ^0.14.0
+  tuple: ^2.0.0
+  latlong2: ^0.8.1
+  positioned_tap_detector_2: ^1.0.4
+  transparent_image: ^2.0.0
+  async: ^2.8.2
+  flutter_image: ^4.1.0
+  vector_math: ^2.1.1
+  proj4dart: ^2.0.0
+  meta: ^1.7.0
+  collection: ^1.15.0
+  latlong: ^0.6.1
   google_maps_flutter: ^2.1.4
   location: ^4.3.0
   datetime_picker_formfield: ^2.0.0

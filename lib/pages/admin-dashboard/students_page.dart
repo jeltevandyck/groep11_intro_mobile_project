@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:groep11_intro_mobile_project/models/student_model.dart';
 import 'package:groep11_intro_mobile_project/pages/admin-dashboard/add_students_page.dart';
+import 'package:groep11_intro_mobile_project/pages/admin-dashboard/answers_page.dart';
+import 'package:groep11_intro_mobile_project/pages/admin-dashboard/location_page.dart';
 
 class StudentsPage extends StatefulWidget {
   const StudentsPage({Key? key}) : super(key: key);
@@ -21,6 +23,8 @@ class _StudentsPageState extends State<StudentsPage> {
   String studentScore = "20";
 
   String? currentAddress;
+
+  String _currentExitCounter = "";
 
   List<StudentModel> students = [];
 
@@ -109,7 +113,7 @@ class _StudentsPageState extends State<StudentsPage> {
                           onTap: () {
                             showStudentInformation(
                                 documentSnapshot!["accountNumber"],
-                                (documentSnapshot["fullName"]));
+                                documentSnapshot["fullName"]);
                           },
                         ),
                       ));
@@ -135,8 +139,8 @@ class _StudentsPageState extends State<StudentsPage> {
                   var width = MediaQuery.of(context).size.width;
 
                   return SizedBox(
-                      height: (height/100)*20,
-                      width: (width/100)*20,
+                      height: (height / 100) * 20,
+                      width: (width / 100) * 20,
                       child: Scaffold(
                           body: Column(
                         children: [
@@ -146,14 +150,9 @@ class _StudentsPageState extends State<StudentsPage> {
                               scoreController.text = value;
                             },
                             decoration: const InputDecoration(
-                              border: OutlineInputBorder(), hintText: "New Score"),
+                                border: OutlineInputBorder(),
+                                hintText: "New Score"),
                           ),
-                          TextButton(
-                              onPressed: () {
-                                //Update student score
-                                Navigator.pop(context);
-                              },
-                              child: const Text("edit"))
                         ],
                       )));
                 },
@@ -161,27 +160,8 @@ class _StudentsPageState extends State<StudentsPage> {
         });
   }
 
-  void showStudentInformation(accountNr, fullname) {
-    final editButton = Material(
-        elevation: 5,
-        borderRadius: BorderRadius.circular(30),
-        color: Colors.red,
-        child: SizedBox(
-          width: 200,
-          child: MaterialButton(
-            padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-            minWidth: MediaQuery.of(context).size.width,
-            onPressed: () {
-              showScoreChange();
-            },
-            child: const Text('Edit',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Colors.white)),
-          ),
-        ));
+  void showStudentInformation(accountNr, fullname) async {
+    await getCurrentExitCounter(accountNr);
     final answersButton = Material(
         elevation: 5,
         borderRadius: BorderRadius.circular(30),
@@ -192,7 +172,7 @@ class _StudentsPageState extends State<StudentsPage> {
             padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             minWidth: MediaQuery.of(context).size.width,
             onPressed: () {
-              print("temp");
+              showAnswers(accountNr);
             },
             child: const Text('Answers',
                 textAlign: TextAlign.center,
@@ -212,7 +192,7 @@ class _StudentsPageState extends State<StudentsPage> {
             padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
             minWidth: MediaQuery.of(context).size.width,
             onPressed: () {
-              print("temp");
+              showLocation(accountNr);
             },
             child: const Text('Location',
                 textAlign: TextAlign.center,
@@ -249,19 +229,13 @@ class _StudentsPageState extends State<StudentsPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text("Score: $studentScore"),
-                                  TextButton(
-                                      onPressed: () {
-                                        showScoreChange();
-                                        //update score after checking open questions
-                                      },
-                                      child: const Text("Edit"))
                                 ],
                               ),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
-                                children: const [
-                                  Text("the student closed the exam 3 times")
+                                children: [
+                                  Text("the student closed the exam ${_currentExitCounter} times")
                                 ],
                               ),
                               Row(
@@ -279,30 +253,32 @@ class _StudentsPageState extends State<StudentsPage> {
         });
   }
 
-  // getAddressFromLatLng(String latitude, String longitude) async {
-  //   try {
-  //     List<Placemark> placemarks = await placemarkFromCoordinates(
-  //       double.parse(latitude),
-  //       double.parse(longitude)
-  //     );
-
-  //     Placemark place = placemarks[0];
-
-  //     setState(() {
-  //       currentAddress = "${place.locality}, ${place.postalCode}, ${place.country}";
-  //     });
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
-
-  //Hier was ik
-  void getStudentExam(accountNr) async {
+  getCurrentExitCounter(accountNr) async {
     QuerySnapshot collection = await FirebaseFirestore.instance
         .collection("student_exams")
         .where("userId", isEqualTo: accountNr)
         .get();
+      setState(() => _currentExitCounter = collection.docs.first["exitCounter"]);
+  }
 
-    print(collection.docs.first["uid"]);
+  Future<QuerySnapshot<Object?>> getStudentExam(accountNr) async {
+    QuerySnapshot collection = await FirebaseFirestore.instance
+        .collection("student_exams")
+        .where("userId", isEqualTo: accountNr)
+        .get();
+      return collection;
+  }
+
+  void showLocation(accountNr) async {
+    QuerySnapshot collection = await FirebaseFirestore.instance
+        .collection("student_exams")
+        .where("userId", isEqualTo: accountNr)
+        .get();
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => LocationPage(lat: collection.docs.first["latitude"], lon: collection.docs.first["longitude"])));
+  }
+  void showAnswers(accountNr) async {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => AnswersPage(accountNr: accountNr,)));
   }
 }

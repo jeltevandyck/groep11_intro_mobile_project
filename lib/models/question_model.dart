@@ -5,7 +5,7 @@ class QuestionModal {
   String? question;
   String? answers;
   String? solution;
-  bool? caseSesitive;
+  bool? caseSensitive;
   String? correctCode;
   String? wrongCode;
 
@@ -16,7 +16,7 @@ class QuestionModal {
     this.question,
     this.answers,
     this.solution,
-    this.caseSesitive,
+    this.caseSensitive,
     this.correctCode,
     this.wrongCode,
   });
@@ -29,7 +29,7 @@ class QuestionModal {
         question: map['question'],
         answers: map['answers'],
         solution: map['solution'],
-        caseSesitive: map['caseSesitive'],
+        caseSensitive: map['caseSensitive'],
         correctCode: map['correctCode'],
         wrongCode: map['wrongCode']);
   }
@@ -42,7 +42,7 @@ class QuestionModal {
       'question': question,
       'answers': answers,
       'solution': solution,
-      'caseSesitive': caseSesitive,
+      'caseSensitive': caseSensitive,
       'correctCode': correctCode,
       'wrongCode': wrongCode
     };
@@ -55,7 +55,7 @@ class QuestionModal {
         max = snapshot.data()['max'],
         answers = snapshot.data()['answers'],
         solution = snapshot.data()['solution'],
-        caseSesitive = snapshot.data()['caseSesitive'],
+        caseSensitive = snapshot.data()['caseSensitive'],
         correctCode = snapshot.data()['correctCode'],
         wrongCode = snapshot.data()['wrongCode'];
 }
