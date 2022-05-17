@@ -25,6 +25,7 @@ class _StudentsPageState extends State<StudentsPage> {
   String? currentAddress;
 
   String _currentExitCounter = "";
+  String _currentTimer = "";
 
   List<StudentModel> students = [];
 
@@ -162,6 +163,7 @@ class _StudentsPageState extends State<StudentsPage> {
 
   void showStudentInformation(accountNr, fullname) async {
     await getCurrentExitCounter(accountNr);
+    await getCurrentTimer(accountNr);
     final answersButton = Material(
         elevation: 5,
         borderRadius: BorderRadius.circular(30),
@@ -235,7 +237,13 @@ class _StudentsPageState extends State<StudentsPage> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  Text("the student closed the exam ${_currentExitCounter} times")
+                                  Text("the student closed the exam $_currentExitCounter times")
+                                ],
+                              ),Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text("Time spend for the exam $_currentTimer")
                                 ],
                               ),
                               Row(
@@ -259,6 +267,13 @@ class _StudentsPageState extends State<StudentsPage> {
         .where("userId", isEqualTo: accountNr)
         .get();
       setState(() => _currentExitCounter = collection.docs.first["exitCounter"]);
+  }
+  getCurrentTimer(accountNr) async {
+    QuerySnapshot collection = await FirebaseFirestore.instance
+        .collection("student_exams")
+        .where("userId", isEqualTo: accountNr)
+        .get();
+      setState(() => _currentTimer = collection.docs.first["endExam"]);
   }
 
   Future<QuerySnapshot<Object?>> getStudentExam(accountNr) async {
