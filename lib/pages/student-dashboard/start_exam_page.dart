@@ -56,7 +56,7 @@ class _StartExamPageState extends State<StartExamPage> {
                           await getStudentExam(widget.accountNr);
                           await getCurrentLocation(uid);
                         },
-                        child: const Text('Start exam'),
+                        child: const Text('Start examm'),
                         style: OutlinedButton.styleFrom(
                           primary: Colors.white,
                           padding: const EdgeInsets.symmetric(
