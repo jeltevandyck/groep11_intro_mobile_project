@@ -8,6 +8,7 @@ import 'package:groep11_intro_mobile_project/models/exam_model.dart';
 import 'package:groep11_intro_mobile_project/models/question_model.dart';
 import 'package:groep11_intro_mobile_project/pages/admin-dashboard/code_question_modal.dart';
 import 'package:groep11_intro_mobile_project/pages/admin-dashboard/create_exam_modal.dart';
+import 'package:groep11_intro_mobile_project/pages/admin-dashboard/mutliple_question_modal.dart';
 import 'package:groep11_intro_mobile_project/pages/admin-dashboard/open_question_modal.dart';
 import 'package:uuid/uuid.dart';
 
@@ -86,7 +87,12 @@ class _CreateExamPageState extends State<CreateExamPage> {
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: ElevatedButton(
-                    onPressed: () {}, child: const Text('Multiple choice')),
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) => MultipleQuestionModal());
+                    },
+                    child: const Text('Multiple choice')),
               ),
               Padding(
                 padding: const EdgeInsets.all(10),

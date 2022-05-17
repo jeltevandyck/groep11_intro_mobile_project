@@ -82,24 +82,26 @@ class _CodeQuestionModalState extends State<CodeQuestionModal> {
               Row(
                 children: [
                   const Text('Case sensitive'),
-                  DropdownButton<String>(
-                    value: widget.isCaseSensitive,
-                    items: ['Yes', 'No'].map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (String? value) {
-                      setState(() {
-                        if (value == 'Yes') {
-                          widget.isCaseSensitive = 'Yes';
-                        } else {
-                          widget.isCaseSensitive = 'No';
-                        }
-                      });
-                    },
-                  ),
+                  Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: DropdownButton<String>(
+                        value: widget.isCaseSensitive,
+                        items: ['Yes', 'No'].map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (String? value) {
+                          setState(() {
+                            if (value == 'Yes') {
+                              widget.isCaseSensitive = 'Yes';
+                            } else {
+                              widget.isCaseSensitive = 'No';
+                            }
+                          });
+                        },
+                      )),
                 ],
               ),
               Padding(
