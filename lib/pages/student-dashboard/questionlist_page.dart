@@ -144,7 +144,7 @@ class _QuestionListPageState extends State<QuestionListPage>
                             longitude: widget.longitude,
                             latitude: widget.latitude,
                             uid: widget.uid,
-                            duration: widget.duration,
+                            duration: duration,
                             listAnswers: widget.listAnswers,
                           ),
                         ));
@@ -174,7 +174,7 @@ class _QuestionListPageState extends State<QuestionListPage>
               onPressed: () {
                 _showMyDialog();
               },
-              child: const Text('Beëndig Examen'),
+              child: const Text('End exam'),
               style: OutlinedButton.styleFrom(
                 primary: Colors.white,
                 padding:
@@ -195,10 +195,10 @@ class _QuestionListPageState extends State<QuestionListPage>
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Ben je zeker dat je de examen wilt beëindigen?'),
+          title: const Text('Are you sure you want to end the exam?'),
           actions: <Widget>[
             TextButton(
-              child: const Text('JA'),
+              child: const Text('YES'),
               onPressed: () async {
                 endExam =
                     ("${twoDigits(duration.inHours)}:${twoDigits(duration.inMinutes.remainder(60))}:${twoDigits(duration.inSeconds.remainder(60))}");
@@ -213,7 +213,7 @@ class _QuestionListPageState extends State<QuestionListPage>
               },
             ),
             TextButton(
-              child: const Text('NEE'),
+              child: const Text('NO'),
               onPressed: () => Navigator.pop(context),
             ),
           ],
