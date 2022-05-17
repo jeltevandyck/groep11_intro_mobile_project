@@ -69,11 +69,7 @@ class _OpenQuestionModalState extends State<OpenQuestionModal> {
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
                             await pushOpenQuestionToDatabase();
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const CreateExamPage()));
+                            Navigator.pop(context);
                           }
                         },
                         child: const Text('Create')),

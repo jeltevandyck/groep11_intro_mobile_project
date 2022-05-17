@@ -93,7 +93,7 @@ class _MultipleQuestionModalState extends State<MultipleQuestionModal> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         await addQuestion();
-                        Navigator.of(context).pop();
+                        Navigator.pop(context);
                       }
                     },
                     child: const Text('Create question')),
