@@ -1,15 +1,24 @@
+import 'dart:async';
+import 'dart:html';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:groep11_intro_mobile_project/models/answers_model.dart';
 import 'package:groep11_intro_mobile_project/models/question_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:groep11_intro_mobile_project/pages/student-dashboard/questionlist_page.dart';
 
 class QuestionPage extends StatefulWidget {
-  const QuestionPage(
+  QuestionPage(
       {this.accountNr,
       this.questionid,
       this.index,
+      this.longitude,
+      this.latitude,
+      this.uid,
+      this.duration,
+      required this.listAnswers,
+      required this.counter,
       Key? key,
       required this.question})
       : super(key: key);
@@ -17,23 +26,91 @@ class QuestionPage extends StatefulWidget {
   final String? accountNr;
   final String? questionid;
   final num? index;
+  final double? longitude;
+  final double? latitude;
+  final String? uid;
+  final Duration? duration;
+  num counter;
+
+  final List<AnswerModel> listAnswers;
+
   @override
   State<QuestionPage> createState() => _QuestionPageState();
 }
 
-class _QuestionPageState extends State<QuestionPage> {
+class _QuestionPageState extends State<QuestionPage>
+    with WidgetsBindingObserver {
   TextEditingController openController = TextEditingController();
   TextEditingController CompareController = TextEditingController();
 
   String defaultValue = "";
 
+  num count = 0;
+
+  Duration duration = Duration();
+  Timer? timer;
+
+  String twoDigits(int n) => n.toString().padLeft(2, '0');
+
+  AnswerModel _answer = AnswerModel();
+
+  @override
+  initState() {
+    super.initState();
+    count = widget.counter;
+
+    if (kIsWeb) {
+      window.addEventListener('focus', onFocus);
+      window.addEventListener('blur', onBlur);
+    } else {
+      WidgetsBinding.instance!.addObserver(this);
+    }
+
+    duration = widget.duration!;
+    startTimer();
+  }
+
+  @override
+  void dispose() {
+    if (kIsWeb) {
+      window.removeEventListener('focus', onFocus);
+      window.removeEventListener('blur', onBlur);
+    } else {
+      WidgetsBinding.instance!.removeObserver(this);
+    }
+    super.dispose();
+  }
+
+  void onFocus(Event e) {
+    didChangeAppLifecycleState(AppLifecycleState.resumed);
+  }
+
+  void onBlur(Event e) {
+    didChangeAppLifecycleState(AppLifecycleState.paused);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    final isBackground = state == AppLifecycleState.paused;
+
+    if (isBackground) {
+      count++;
+    } else {}
+  }
+
   @override
   Widget build(BuildContext context) {
     List<String>? _answers = widget.question.answers?.split(";");
-    print(_answers);
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Question'),
+          title:
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Text("Questions"),
+            Text(
+                "${twoDigits(duration.inHours)}:${twoDigits(duration.inMinutes.remainder(60))}:${twoDigits(duration.inSeconds.remainder(60))}"),
+          ]),
           automaticallyImplyLeading: true,
         ),
         body: Center(
@@ -79,11 +156,20 @@ class _QuestionPageState extends State<QuestionPage> {
                                   widget.question.solution.toString(),
                                   widget.questionid.toString(),
                                   widget.accountNr.toString());
+
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => VragenExamPage(
-                                        accountNr: widget.accountNr),
+                                    builder: (context) => QuestionListPage(
+                                      accountNr: widget.accountNr,
+                                      count: count,
+                                      longitude: widget.longitude,
+                                      latitude: widget.latitude,
+                                      uid: widget.uid,
+                                      duration: duration,
+                                      answer: _answer,
+                                      listAnswers: widget.listAnswers,
+                                    ),
                                   ));
                             },
                             child: const Text('Submit'),
@@ -118,7 +204,7 @@ class _QuestionPageState extends State<QuestionPage> {
                                 textAlign: TextAlign.left,
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
-                                  hintText: 'Fill in',
+                                  hintText: 'Vul in',
                                   hintStyle: TextStyle(color: Colors.grey),
                                 ),
                               ),
@@ -137,8 +223,16 @@ class _QuestionPageState extends State<QuestionPage> {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => VragenExamPage(
-                                            accountNr: widget.accountNr),
+                                        builder: (context) => QuestionListPage(
+                                          accountNr: widget.accountNr,
+                                          count: count,
+                                          longitude: widget.longitude,
+                                          latitude: widget.latitude,
+                                          uid: widget.uid,
+                                          duration: duration,
+                                          answer: _answer,
+                                          listAnswers: widget.listAnswers,
+                                        ),
                                       ));
                                 },
                                 child: const Text('Submit'),
@@ -163,7 +257,7 @@ class _QuestionPageState extends State<QuestionPage> {
                                 textAlign: TextAlign.left,
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
-                                  hintText: 'Fill in',
+                                  hintText: 'Vul in',
                                   hintStyle: TextStyle(color: Colors.grey),
                                 ),
                               ),
@@ -180,8 +274,15 @@ class _QuestionPageState extends State<QuestionPage> {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => VragenExamPage(
+                                        builder: (context) => QuestionListPage(
                                           accountNr: widget.accountNr,
+                                          count: count,
+                                          longitude: widget.longitude,
+                                          latitude: widget.latitude,
+                                          uid: widget.uid,
+                                          duration: duration,
+                                          answer: _answer,
+                                          listAnswers: widget.listAnswers,
                                         ),
                                       ));
                                 },
@@ -209,10 +310,12 @@ class _QuestionPageState extends State<QuestionPage> {
     answerModel.questionId = questionid;
     answerModel.userId = userId;
 
-    await firebaseFirestore
+    _answer = answerModel;
+
+    /*await firebaseFirestore
         .collection("answers")
         .doc()
-        .set(answerModel.toMap());
+        .set(answerModel.toMap());*/
   }
 
   uploadOpenAnswer(String answer, String questionid, String userId) async {
@@ -223,10 +326,12 @@ class _QuestionPageState extends State<QuestionPage> {
     answerModel.questionId = questionid;
     answerModel.userId = userId;
 
-    await firebaseFirestore
+    _answer = answerModel;
+
+    /*await firebaseFirestore
         .collection("answers")
         .doc()
-        .set(answerModel.toMap());
+        .set(answerModel.toMap());*/
   }
 
   uploadCompareAnswer(String answer, String questionid, String userId,
@@ -252,9 +357,23 @@ class _QuestionPageState extends State<QuestionPage> {
     answerModel.questionId = questionid;
     answerModel.userId = userId;
 
-    await firebaseFirestore
+    _answer = answerModel;
+
+    /*await firebaseFirestore
         .collection("answers")
         .doc()
-        .set(answerModel.toMap());
+        .set(answerModel.toMap());*/
+  }
+
+  void startTimer() {
+    timer = Timer.periodic(Duration(seconds: 1), (_) => addTime());
+  }
+
+  void addTime() {
+    final addSeconds = 1;
+    setState(() {
+      final seconds = duration.inSeconds + addSeconds;
+      duration = Duration(seconds: seconds);
+    });
   }
 }

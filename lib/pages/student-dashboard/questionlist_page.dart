@@ -1,37 +1,104 @@
+import 'dart:async';
+import 'dart:html';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:groep11_intro_mobile_project/models/answers_model.dart';
 import 'package:groep11_intro_mobile_project/models/question_model.dart';
+import 'package:groep11_intro_mobile_project/pages/Login-dashboard/student_login_page.dart';
 import 'package:groep11_intro_mobile_project/pages/student-dashboard/start_exam_page.dart';
+import '../../models/student_exam_model.dart';
 import 'question_page.dart';
 
-class VragenExamPage extends StatefulWidget {
-  const VragenExamPage({this.accountNr, Key? key}) : super(key: key);
+class QuestionListPage extends StatefulWidget {
+  QuestionListPage(
+      {this.accountNr,
+      this.longitude,
+      this.latitude,
+      this.uid,
+      this.duration,
+      required this.answer,
+      required this.listAnswers,
+      required this.count,
+      Key? key})
+      : super(key: key);
   final String? accountNr;
+  final num? count;
+  final double? longitude;
+  final double? latitude;
+  final String? uid;
+  final Duration? duration;
+
+  final AnswerModel answer;
+  final List<AnswerModel> listAnswers;
 
   @override
-  State<VragenExamPage> createState() => _VragenExamPageState();
+  State<QuestionListPage> createState() => _QuestionListPageState();
 }
 
-class _VragenExamPageState extends State<VragenExamPage>
+class _QuestionListPageState extends State<QuestionListPage>
     with WidgetsBindingObserver {
   List<QuestionModal> _questions = [];
   String _currentQuestionid = "";
+
+  num counter = 0;
+
+  String? endExam = "";
+  Duration duration = Duration();
+  Timer? timer;
+  String twoDigits(int n) => n.toString().padLeft(2, '0');
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    getQuestions();
+    duration = widget.duration!;
   }
 
   @override
   initState() {
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
+    if (kIsWeb) {
+      window.addEventListener('focus', onFocus);
+      window.addEventListener('blur', onBlur);
+    } else {
+      WidgetsBinding.instance!.addObserver(this);
+    }
+    getQuestions();
+    startTimer();
+
+    if (widget.count != null) {
+      counter = widget.count!;
+    } else {
+      counter = counter;
+    }
+
+    for (var i = 0; i < widget.listAnswers.length; i++) {
+      if (widget.listAnswers[i].questionId == widget.answer.questionId) {
+        widget.listAnswers.removeAt(i);
+      }
+    }
+    widget.listAnswers.add(widget.answer);
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance?.removeObserver(this);
+    if (kIsWeb) {
+      window.removeEventListener('focus', onFocus);
+      window.removeEventListener('blur', onBlur);
+    } else {
+      WidgetsBinding.instance!.removeObserver(this);
+    }
     super.dispose();
+  }
+
+  void onFocus(Event e) {
+    didChangeAppLifecycleState(AppLifecycleState.resumed);
+  }
+
+  void onBlur(Event e) {
+    didChangeAppLifecycleState(AppLifecycleState.paused);
   }
 
   @override
@@ -41,18 +108,22 @@ class _VragenExamPageState extends State<VragenExamPage>
     final isBackground = state == AppLifecycleState.paused;
 
     if (isBackground) {
-      print("App is in background");
-    } else {
-      print("App is in foreground");
-    }
+      counter++;
+    } else {}
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Questions'),
+        title:
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Text("Questions"),
+          Text(
+              "${twoDigits(duration.inHours)}:${twoDigits(duration.inMinutes.remainder(60))}:${twoDigits(duration.inSeconds.remainder(60))}"),
+        ]),
         automaticallyImplyLeading: false,
+        centerTitle: false,
       ),
       body: Stack(children: [
         ListView.builder(
@@ -69,6 +140,12 @@ class _VragenExamPageState extends State<VragenExamPage>
                             accountNr: widget.accountNr,
                             questionid: _currentQuestionid,
                             index: index,
+                            counter: counter,
+                            longitude: widget.longitude,
+                            latitude: widget.latitude,
+                            uid: widget.uid,
+                            duration: widget.duration,
+                            listAnswers: widget.listAnswers,
                           ),
                         ));
                   },
@@ -121,12 +198,12 @@ class _VragenExamPageState extends State<VragenExamPage>
           title: const Text('You sure you want to end the exam?'),
           actions: <Widget>[
             TextButton(
-              child: const Text('YES'),
+              child: const Text('JA'),
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const StartExamPage()),
+                      builder: (context) => const StudentLoginPage()),
                 );
               },
             ),
@@ -142,7 +219,6 @@ class _VragenExamPageState extends State<VragenExamPage>
 
   getQuestionId(int index) async {
     var data = await FirebaseFirestore.instance.collection('questions').get();
-    print(data.docs[index].id);
     setState(() {
       _currentQuestionid = data.docs[index].id;
     });
@@ -153,6 +229,46 @@ class _VragenExamPageState extends State<VragenExamPage>
     setState(() {
       _questions =
           List.from(data.docs.map((doc) => QuestionModal.fromSnapshot(doc)));
+    });
+  }
+
+  updateStudentExam(num? countss) async {
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    StudentExamModel studentExamModel = StudentExamModel();
+    studentExamModel.uid = widget.uid;
+    studentExamModel.userId = widget.accountNr;
+    studentExamModel.longitude = widget.longitude.toString();
+    studentExamModel.latitude = widget.latitude.toString();
+    studentExamModel.exitCounter = countss.toString();
+    studentExamModel.endExam = endExam;
+
+    await firebaseFirestore
+        .collection("student_exams")
+        .doc(studentExamModel.uid)
+        .set(studentExamModel.toMap());
+
+    Fluttertoast.showToast(msg: "The exam is finished and succesfuly submited");
+  }
+
+  uploadExams(List<AnswerModel> answers) {
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    AnswerModel answerModel = AnswerModel();
+
+    for (var i = 1; i < answers.length; i++) {
+      answerModel = answers[i];
+      firebaseFirestore.collection("answers").doc().set(answerModel.toMap());
+    }
+  }
+
+  void startTimer() {
+    timer = Timer.periodic(Duration(seconds: 1), (_) => addTime());
+  }
+
+  void addTime() {
+    final addSeconds = 1;
+    setState(() {
+      final seconds = duration.inSeconds + addSeconds;
+      duration = Duration(seconds: seconds);
     });
   }
 }
