@@ -144,7 +144,7 @@ class _QuestionListPageState extends State<QuestionListPage>
                             longitude: widget.longitude,
                             latitude: widget.latitude,
                             uid: widget.uid,
-                            duration: widget.duration,
+                            duration: duration,
                             listAnswers: widget.listAnswers,
                           ),
                         ));

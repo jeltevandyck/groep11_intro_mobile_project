@@ -65,8 +65,9 @@ class _QuestionPageState extends State<QuestionPage>
     } else {
       WidgetsBinding.instance!.addObserver(this);
     }
-
+    print(widget.duration);
     duration = widget.duration!;
+
     startTimer();
   }
 
