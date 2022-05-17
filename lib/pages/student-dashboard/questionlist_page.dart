@@ -73,6 +73,12 @@ class _QuestionListPageState extends State<QuestionListPage>
     } else {
       counter = counter;
     }
+
+    for (var i = 0; i < widget.listAnswers.length; i++) {
+      if (widget.listAnswers[i].questionId == widget.answer.questionId) {
+        widget.listAnswers.removeAt(i);
+      }
+    }
     widget.listAnswers.add(widget.answer);
   }
 
