@@ -15,6 +15,7 @@ class QuestionPage extends StatefulWidget {
       this.index,
       this.longitude,
       this.latitude,
+      this.uid,
       required this.counter,
       Key? key,
       required this.question})
@@ -25,6 +26,7 @@ class QuestionPage extends StatefulWidget {
   final num? index;
   final double? longitude;
   final double? latitude;
+  final String? uid;
   num counter;
 
   @override
@@ -137,11 +139,12 @@ class _QuestionPageState extends State<QuestionPage>
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => VragenExamPage(
+                                    builder: (context) => QuestionListPage(
                                         accountNr: widget.accountNr,
                                         count: count,
                                         longitude: widget.longitude,
-                                        latitude: widget.latitude),
+                                        latitude: widget.latitude,
+                                        uid: widget.uid),
                                   ));
                             },
                             child: const Text('Submit'),
@@ -195,11 +198,12 @@ class _QuestionPageState extends State<QuestionPage>
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => VragenExamPage(
+                                        builder: (context) => QuestionListPage(
                                           accountNr: widget.accountNr,
                                           count: count,
                                           longitude: widget.longitude,
                                           latitude: widget.latitude,
+                                          uid: widget.uid,
                                         ),
                                       ));
                                 },
@@ -234,7 +238,6 @@ class _QuestionPageState extends State<QuestionPage>
                                   const EdgeInsets.symmetric(vertical: 16.0),
                               child: ElevatedButton(
                                 onPressed: () {
-                                  print(count);
                                   uploadOpenAnswer(
                                       openController.text,
                                       widget.questionid.toString(),
@@ -242,11 +245,12 @@ class _QuestionPageState extends State<QuestionPage>
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => VragenExamPage(
+                                        builder: (context) => QuestionListPage(
                                           accountNr: widget.accountNr,
                                           count: count,
                                           longitude: widget.longitude,
                                           latitude: widget.latitude,
+                                          uid: widget.uid,
                                         ),
                                       ));
                                 },

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:html';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -10,8 +11,8 @@ import 'package:groep11_intro_mobile_project/pages/student-dashboard/start_exam_
 import '../../models/student_exam_model.dart';
 import 'question_page.dart';
 
-class VragenExamPage extends StatefulWidget {
-  const VragenExamPage(
+class QuestionListPage extends StatefulWidget {
+  const QuestionListPage(
       {this.accountNr,
       this.longitude,
       this.latitude,
@@ -26,20 +27,26 @@ class VragenExamPage extends StatefulWidget {
   final String? uid;
 
   @override
-  State<VragenExamPage> createState() => _VragenExamPageState();
+  State<QuestionListPage> createState() => _QuestionListPageState();
 }
 
-class _VragenExamPageState extends State<VragenExamPage>
+class _QuestionListPageState extends State<QuestionListPage>
     with WidgetsBindingObserver {
   List<QuestionModal> _questions = [];
   String _currentQuestionid = "";
 
   num counter = 0;
 
+  Timer? _timer;
+
+  Duration startexamen = Duration();
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     getQuestions();
+    getStudentExam(widget.accountNr);
+    startTimer();
   }
 
   @override
@@ -79,26 +86,42 @@ class _VragenExamPageState extends State<VragenExamPage>
     final isBackground = state == AppLifecycleState.paused;
 
     if (isBackground) {
-      print("App is in background");
       counter++;
-    } else {
-      print("App is in foreground");
-    }
+    } else {}
+  }
+
+  startTimer() {
+    _timer = Timer.periodic(Duration(seconds: 1), (_) {
+      final reduceSecondsBy = 1;
+      setState(() {
+        startexamen.inSeconds - 1;
+
+        final seconds = startexamen.inSeconds - reduceSecondsBy;
+        if (seconds < 0) {
+          _timer?.cancel();
+        } else {
+          startexamen = Duration(seconds: seconds);
+        }
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    print(counter);
     if (widget.count != null) {
       counter = widget.count!;
     }
-
-    print(widget.longitude);
-    print(widget.latitude);
+    String strDigits(int n) => n.toString().padLeft(2, '0');
+    final hours = strDigits(startexamen.inHours.remainder(24));
+    final minutes = strDigits(startexamen.inMinutes.remainder(60));
+    final seconds = strDigits(startexamen.inSeconds.remainder(60));
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Vragen'),
+        title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [Text("Vragen"), Text('$hours:$minutes:$seconds')]),
         automaticallyImplyLeading: false,
+        centerTitle: false,
       ),
       body: Stack(children: [
         ListView.builder(
@@ -118,6 +141,7 @@ class _VragenExamPageState extends State<VragenExamPage>
                             counter: counter,
                             longitude: widget.longitude,
                             latitude: widget.latitude,
+                            uid: widget.uid,
                           ),
                         ));
                   },
@@ -205,6 +229,16 @@ class _VragenExamPageState extends State<VragenExamPage>
     });
   }
 
+  Future getStudentExam(accountNr) async {
+    QuerySnapshot collection = await FirebaseFirestore.instance
+        .collection("student_exams")
+        .where("userId", isEqualTo: accountNr)
+        .get();
+
+    setState(() =>
+        startexamen = Duration(minutes: collection.docs.first["tijdExamen"]));
+  }
+
   updateStudentExam(num? countss) async {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     StudentExamModel studentExamModel = StudentExamModel();
@@ -213,12 +247,6 @@ class _VragenExamPageState extends State<VragenExamPage>
     studentExamModel.longitude = widget.longitude.toString();
     studentExamModel.latitude = widget.latitude.toString();
     studentExamModel.exitCounter = countss.toString();
-
-    print(studentExamModel.uid);
-    print(studentExamModel.userId);
-    print(studentExamModel.longitude);
-    print(studentExamModel.latitude);
-    print(studentExamModel.exitCounter);
 
     await firebaseFirestore
         .collection("student_exams")

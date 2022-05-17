@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:html';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -17,34 +20,15 @@ class _StartExamPageState extends State<StartExamPage> {
   double? longitude;
   double? latitude;
 
+  String? uid = "";
+
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(body: startExam());
+  void initState() {
+    super.initState();
   }
 
-  Widget startExam() {
-    Scaffold c1(String uid) {
-      return Scaffold(
-        body: Center(
-          child: ElevatedButton(
-            onPressed: () async {
-              await getCurrentLocation(uid);
-            },
-            child: const Text('Start exam'),
-            style: OutlinedButton.styleFrom(
-              primary: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-              textStyle: const TextStyle(fontSize: 20),
-              backgroundColor: Colors.red,
-            ),
-          ),
-        ),
-      );
-    }
-
-    final c2 = Center(
-      child: Text("Er is geen examen"),
-    );
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
         body: StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection("exams").snapshots(),
@@ -56,14 +40,35 @@ class _StartExamPageState extends State<StartExamPage> {
         } else {
           var documentSnapshot = snapshot.data?.docs.isNotEmpty;
           return Center(
-            child: documentSnapshot == true ? c1("test") : c2,
+            child: (documentSnapshot == true)
+                ? Scaffold(
+                    body: Center(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          await getStudentExam(widget.accountNr);
+                          await getCurrentLocation(uid);
+                        },
+                        child: const Text('Start exam'),
+                        style: OutlinedButton.styleFrom(
+                          primary: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 30, vertical: 20),
+                          textStyle: const TextStyle(fontSize: 20),
+                          backgroundColor: Colors.red,
+                        ),
+                      ),
+                    ),
+                  )
+                : Center(
+                    child: Text("Er is geen examen"),
+                  ),
           );
         }
       },
     ));
   }
 
-  getCurrentLocation(String uid) async {
+  getCurrentLocation(String? uid) async {
     Geolocator.getCurrentPosition(
             desiredAccuracy: LocationAccuracy.best,
             forceAndroidLocationManager: true)
@@ -74,7 +79,7 @@ class _StartExamPageState extends State<StartExamPage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => VragenExamPage(
+            builder: (context) => QuestionListPage(
                   accountNr: widget.accountNr,
                   count: 0,
                   longitude: longitude,
@@ -87,7 +92,16 @@ class _StartExamPageState extends State<StartExamPage> {
     });
   }
 
-  uploadStudentExamToFirebase(String uid, double? lon, double? lat) async {
+  getStudentExam(accountNr) async {
+    QuerySnapshot collection = await FirebaseFirestore.instance
+        .collection("student_exams")
+        .where("userId", isEqualTo: accountNr)
+        .get();
+
+    setState(() => uid = collection.docs.first["uid"]);
+  }
+
+  uploadStudentExamToFirebase(String? uid, double? lon, double? lat) async {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     StudentExamModel studentExamModel = StudentExamModel();
     studentExamModel.uid = uid;
@@ -95,6 +109,7 @@ class _StartExamPageState extends State<StartExamPage> {
     studentExamModel.longitude = lon.toString();
     studentExamModel.latitude = lat.toString();
     studentExamModel.exitCounter = "0";
+    studentExamModel.tijdExamen = 60;
 
     await firebaseFirestore
         .collection("student_exams")

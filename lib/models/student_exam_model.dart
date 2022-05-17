@@ -6,23 +6,24 @@ class StudentExamModel {
   String? latitude;
   String? longitude;
   String? exitCounter;
+  num? tijdExamen;
 
-  StudentExamModel({
-    this.uid,
-    this.userId,
-    this.latitude,
-    this.longitude,
-    this.exitCounter,
-  });
+  StudentExamModel(
+      {this.uid,
+      this.userId,
+      this.latitude,
+      this.longitude,
+      this.exitCounter,
+      this.tijdExamen});
 
   factory StudentExamModel.fromMap(map) {
     return StudentExamModel(
-      uid: map['uid'],
-      userId: map['userId'],
-      latitude: map['latitude'],
-      longitude: map['longitude'],
-      exitCounter: map['exitCounter'],
-    );
+        uid: map['uid'],
+        userId: map['userId'],
+        latitude: map['latitude'],
+        longitude: map['longitude'],
+        exitCounter: map['exitCounter'],
+        tijdExamen: map['tijdExamen']);
   }
 
   Map<String, dynamic> toMap() {
@@ -32,6 +33,7 @@ class StudentExamModel {
       'latitude': latitude,
       'longitude': longitude,
       'exitCounter': exitCounter,
+      'tijdExamen': tijdExamen
     };
   }
 }
