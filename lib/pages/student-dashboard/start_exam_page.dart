@@ -22,9 +22,13 @@ class _StartExamPageState extends State<StartExamPage> {
 
   String? uid = "";
 
+  Duration duration = Duration();
+  Timer? timer;
+
   @override
   void initState() {
     super.initState();
+    startTimer();
   }
 
   @override
@@ -85,6 +89,7 @@ class _StartExamPageState extends State<StartExamPage> {
                   longitude: longitude,
                   latitude: latitude,
                   uid: uid,
+                  duration: duration,
                 )),
       );
     }).catchError((e) {
@@ -109,7 +114,7 @@ class _StartExamPageState extends State<StartExamPage> {
     studentExamModel.longitude = lon.toString();
     studentExamModel.latitude = lat.toString();
     studentExamModel.exitCounter = "0";
-    studentExamModel.tijdExamen = 60;
+    studentExamModel.endExam = "";
 
     await firebaseFirestore
         .collection("student_exams")
@@ -117,5 +122,17 @@ class _StartExamPageState extends State<StartExamPage> {
         .set(studentExamModel.toMap());
 
     Fluttertoast.showToast(msg: "The exam is started");
+  }
+
+  void startTimer() {
+    timer = Timer.periodic(Duration(seconds: 1), (_) => addTime());
+  }
+
+  void addTime() {
+    final addSeconds = 1;
+    setState(() {
+      final seconds = duration.inSeconds + addSeconds;
+      duration = Duration(seconds: seconds);
+    });
   }
 }

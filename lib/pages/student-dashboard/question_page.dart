@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:html';
 
 import 'package:flutter/foundation.dart';
@@ -5,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:groep11_intro_mobile_project/models/answers_model.dart';
 import 'package:groep11_intro_mobile_project/models/question_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:groep11_intro_mobile_project/pages/student-dashboard/questionlist_page.dart';
 
 class QuestionPage extends StatefulWidget {
@@ -16,6 +16,7 @@ class QuestionPage extends StatefulWidget {
       this.longitude,
       this.latitude,
       this.uid,
+      this.duration,
       required this.counter,
       Key? key,
       required this.question})
@@ -27,6 +28,7 @@ class QuestionPage extends StatefulWidget {
   final double? longitude;
   final double? latitude;
   final String? uid;
+  final Duration? duration;
   num counter;
 
   @override
@@ -42,6 +44,11 @@ class _QuestionPageState extends State<QuestionPage>
 
   num count = 0;
 
+  Duration duration = Duration();
+  Timer? timer;
+
+  String twoDigits(int n) => n.toString().padLeft(2, '0');
+
   @override
   initState() {
     super.initState();
@@ -53,6 +60,9 @@ class _QuestionPageState extends State<QuestionPage>
     } else {
       WidgetsBinding.instance!.addObserver(this);
     }
+
+    duration = widget.duration!;
+    startTimer();
   }
 
   @override
@@ -90,7 +100,12 @@ class _QuestionPageState extends State<QuestionPage>
     List<String>? _answers = widget.question.answers?.split(";");
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Vraag'),
+          title:
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Text("Questions"),
+            Text(
+                "${twoDigits(duration.inHours)}:${twoDigits(duration.inMinutes.remainder(60))}:${twoDigits(duration.inSeconds.remainder(60))}"),
+          ]),
           automaticallyImplyLeading: true,
         ),
         body: Center(
@@ -144,7 +159,8 @@ class _QuestionPageState extends State<QuestionPage>
                                         count: count,
                                         longitude: widget.longitude,
                                         latitude: widget.latitude,
-                                        uid: widget.uid),
+                                        uid: widget.uid,
+                                        duration: duration),
                                   ));
                             },
                             child: const Text('Submit'),
@@ -179,7 +195,7 @@ class _QuestionPageState extends State<QuestionPage>
                                 textAlign: TextAlign.left,
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
-                                  hintText: 'Vul in',
+                                  hintText: 'Fill In',
                                   hintStyle: TextStyle(color: Colors.grey),
                                 ),
                               ),
@@ -204,6 +220,7 @@ class _QuestionPageState extends State<QuestionPage>
                                           longitude: widget.longitude,
                                           latitude: widget.latitude,
                                           uid: widget.uid,
+                                          duration: duration,
                                         ),
                                       ));
                                 },
@@ -218,7 +235,8 @@ class _QuestionPageState extends State<QuestionPage>
                           children: <Widget>[
                             Padding(
                                 padding: const EdgeInsets.all(100),
-                                child: Text("Vraag ${widget.question.question}",
+                                child: Text(
+                                    "Question ${widget.question.question}",
                                     style: const TextStyle(fontSize: 40))),
                             SizedBox(
                               width: 350,
@@ -228,7 +246,7 @@ class _QuestionPageState extends State<QuestionPage>
                                 textAlign: TextAlign.left,
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
-                                  hintText: 'Vul in',
+                                  hintText: 'Fill In',
                                   hintStyle: TextStyle(color: Colors.grey),
                                 ),
                               ),
@@ -251,6 +269,7 @@ class _QuestionPageState extends State<QuestionPage>
                                           longitude: widget.longitude,
                                           latitude: widget.latitude,
                                           uid: widget.uid,
+                                          duration: duration,
                                         ),
                                       ));
                                 },
@@ -325,5 +344,17 @@ class _QuestionPageState extends State<QuestionPage>
         .collection("answers")
         .doc()
         .set(answerModel.toMap());
+  }
+
+  void startTimer() {
+    timer = Timer.periodic(Duration(seconds: 1), (_) => addTime());
+  }
+
+  void addTime() {
+    final addSeconds = 1;
+    setState(() {
+      final seconds = duration.inSeconds + addSeconds;
+      duration = Duration(seconds: seconds);
+    });
   }
 }

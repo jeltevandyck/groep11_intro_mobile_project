@@ -17,6 +17,7 @@ class QuestionListPage extends StatefulWidget {
       this.longitude,
       this.latitude,
       this.uid,
+      this.duration,
       required this.count,
       Key? key})
       : super(key: key);
@@ -25,6 +26,7 @@ class QuestionListPage extends StatefulWidget {
   final double? longitude;
   final double? latitude;
   final String? uid;
+  final Duration? duration;
 
   @override
   State<QuestionListPage> createState() => _QuestionListPageState();
@@ -37,16 +39,17 @@ class _QuestionListPageState extends State<QuestionListPage>
 
   num counter = 0;
 
-  Timer? _timer;
+  String? endExam = "";
 
-  Duration startexamen = Duration();
+  Duration duration = Duration();
+  Timer? timer;
+
+  String twoDigits(int n) => n.toString().padLeft(2, '0');
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    getQuestions();
-    getStudentExam(widget.accountNr);
-    startTimer();
+    duration = widget.duration!;
   }
 
   @override
@@ -57,6 +60,14 @@ class _QuestionListPageState extends State<QuestionListPage>
       window.addEventListener('blur', onBlur);
     } else {
       WidgetsBinding.instance!.addObserver(this);
+    }
+    getQuestions();
+    startTimer();
+
+    if (widget.count != null) {
+      counter = widget.count!;
+    } else {
+      counter = counter;
     }
   }
 
@@ -90,36 +101,16 @@ class _QuestionListPageState extends State<QuestionListPage>
     } else {}
   }
 
-  startTimer() {
-    _timer = Timer.periodic(Duration(seconds: 1), (_) {
-      final reduceSecondsBy = 1;
-      setState(() {
-        startexamen.inSeconds - 1;
-
-        final seconds = startexamen.inSeconds - reduceSecondsBy;
-        if (seconds < 0) {
-          _timer?.cancel();
-        } else {
-          startexamen = Duration(seconds: seconds);
-        }
-      });
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (widget.count != null) {
-      counter = widget.count!;
-    }
-    String strDigits(int n) => n.toString().padLeft(2, '0');
-    final hours = strDigits(startexamen.inHours.remainder(24));
-    final minutes = strDigits(startexamen.inMinutes.remainder(60));
-    final seconds = strDigits(startexamen.inSeconds.remainder(60));
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [Text("Vragen"), Text('$hours:$minutes:$seconds')]),
+        title:
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Text("Questions"),
+          Text(
+              "${twoDigits(duration.inHours)}:${twoDigits(duration.inMinutes.remainder(60))}:${twoDigits(duration.inSeconds.remainder(60))}"),
+        ]),
         automaticallyImplyLeading: false,
         centerTitle: false,
       ),
@@ -142,6 +133,7 @@ class _QuestionListPageState extends State<QuestionListPage>
                             longitude: widget.longitude,
                             latitude: widget.latitude,
                             uid: widget.uid,
+                            duration: widget.duration,
                           ),
                         ));
                   },
@@ -195,8 +187,11 @@ class _QuestionListPageState extends State<QuestionListPage>
           actions: <Widget>[
             TextButton(
               child: const Text('JA'),
-              onPressed: () {
-                updateStudentExam(counter);
+              onPressed: () async {
+                endExam =
+                    ("${twoDigits(duration.inHours)}:${twoDigits(duration.inMinutes.remainder(60))}:${twoDigits(duration.inSeconds.remainder(60))}");
+                print(endExam);
+                await updateStudentExam(counter);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -229,16 +224,6 @@ class _QuestionListPageState extends State<QuestionListPage>
     });
   }
 
-  Future getStudentExam(accountNr) async {
-    QuerySnapshot collection = await FirebaseFirestore.instance
-        .collection("student_exams")
-        .where("userId", isEqualTo: accountNr)
-        .get();
-
-    setState(() =>
-        startexamen = Duration(minutes: collection.docs.first["tijdExamen"]));
-  }
-
   updateStudentExam(num? countss) async {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     StudentExamModel studentExamModel = StudentExamModel();
@@ -247,10 +232,25 @@ class _QuestionListPageState extends State<QuestionListPage>
     studentExamModel.longitude = widget.longitude.toString();
     studentExamModel.latitude = widget.latitude.toString();
     studentExamModel.exitCounter = countss.toString();
+    studentExamModel.endExam = endExam;
+
+    print(countss);
 
     await firebaseFirestore
         .collection("student_exams")
         .doc(studentExamModel.uid)
         .set(studentExamModel.toMap());
+  }
+
+  void startTimer() {
+    timer = Timer.periodic(Duration(seconds: 1), (_) => addTime());
+  }
+
+  void addTime() {
+    final addSeconds = 1;
+    setState(() {
+      final seconds = duration.inSeconds + addSeconds;
+      duration = Duration(seconds: seconds);
+    });
   }
 }
