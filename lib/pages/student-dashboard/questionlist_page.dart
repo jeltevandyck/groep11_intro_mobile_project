@@ -4,6 +4,7 @@ import 'dart:html';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:groep11_intro_mobile_project/models/answers_model.dart';
 import 'package:groep11_intro_mobile_project/models/question_model.dart';
 import 'package:groep11_intro_mobile_project/pages/Login-dashboard/student_login_page.dart';
@@ -12,12 +13,14 @@ import '../../models/student_exam_model.dart';
 import 'question_page.dart';
 
 class QuestionListPage extends StatefulWidget {
-  const QuestionListPage(
+  QuestionListPage(
       {this.accountNr,
       this.longitude,
       this.latitude,
       this.uid,
       this.duration,
+      required this.answer,
+      required this.listAnswers,
       required this.count,
       Key? key})
       : super(key: key);
@@ -27,6 +30,9 @@ class QuestionListPage extends StatefulWidget {
   final double? latitude;
   final String? uid;
   final Duration? duration;
+
+  final AnswerModel answer;
+  final List<AnswerModel> listAnswers;
 
   @override
   State<QuestionListPage> createState() => _QuestionListPageState();
@@ -40,10 +46,8 @@ class _QuestionListPageState extends State<QuestionListPage>
   num counter = 0;
 
   String? endExam = "";
-
   Duration duration = Duration();
   Timer? timer;
-
   String twoDigits(int n) => n.toString().padLeft(2, '0');
 
   @override
@@ -69,6 +73,7 @@ class _QuestionListPageState extends State<QuestionListPage>
     } else {
       counter = counter;
     }
+    widget.listAnswers.add(widget.answer);
   }
 
   @override
@@ -134,6 +139,7 @@ class _QuestionListPageState extends State<QuestionListPage>
                             latitude: widget.latitude,
                             uid: widget.uid,
                             duration: widget.duration,
+                            listAnswers: widget.listAnswers,
                           ),
                         ));
                   },
@@ -190,8 +196,9 @@ class _QuestionListPageState extends State<QuestionListPage>
               onPressed: () async {
                 endExam =
                     ("${twoDigits(duration.inHours)}:${twoDigits(duration.inMinutes.remainder(60))}:${twoDigits(duration.inSeconds.remainder(60))}");
-                print(endExam);
                 await updateStudentExam(counter);
+                await uploadExams(widget.listAnswers);
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -234,12 +241,22 @@ class _QuestionListPageState extends State<QuestionListPage>
     studentExamModel.exitCounter = countss.toString();
     studentExamModel.endExam = endExam;
 
-    print(countss);
-
     await firebaseFirestore
         .collection("student_exams")
         .doc(studentExamModel.uid)
         .set(studentExamModel.toMap());
+
+    Fluttertoast.showToast(msg: "The exam is finished and succesfuly submited");
+  }
+
+  uploadExams(List<AnswerModel> answers) {
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    AnswerModel answerModel = AnswerModel();
+
+    for (var i = 1; i < answers.length; i++) {
+      answerModel = answers[i];
+      firebaseFirestore.collection("answers").doc().set(answerModel.toMap());
+    }
   }
 
   void startTimer() {

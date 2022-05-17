@@ -17,6 +17,7 @@ class QuestionPage extends StatefulWidget {
       this.latitude,
       this.uid,
       this.duration,
+      required this.listAnswers,
       required this.counter,
       Key? key,
       required this.question})
@@ -30,6 +31,8 @@ class QuestionPage extends StatefulWidget {
   final String? uid;
   final Duration? duration;
   num counter;
+
+  final List<AnswerModel> listAnswers;
 
   @override
   State<QuestionPage> createState() => _QuestionPageState();
@@ -48,6 +51,8 @@ class _QuestionPageState extends State<QuestionPage>
   Timer? timer;
 
   String twoDigits(int n) => n.toString().padLeft(2, '0');
+
+  AnswerModel _answer = AnswerModel();
 
   @override
   initState() {
@@ -151,16 +156,20 @@ class _QuestionPageState extends State<QuestionPage>
                                   widget.question.solution.toString(),
                                   widget.questionid.toString(),
                                   widget.accountNr.toString());
+
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => QuestionListPage(
-                                        accountNr: widget.accountNr,
-                                        count: count,
-                                        longitude: widget.longitude,
-                                        latitude: widget.latitude,
-                                        uid: widget.uid,
-                                        duration: duration),
+                                      accountNr: widget.accountNr,
+                                      count: count,
+                                      longitude: widget.longitude,
+                                      latitude: widget.latitude,
+                                      uid: widget.uid,
+                                      duration: duration,
+                                      answer: _answer,
+                                      listAnswers: widget.listAnswers,
+                                    ),
                                   ));
                             },
                             child: const Text('Submit'),
@@ -221,6 +230,8 @@ class _QuestionPageState extends State<QuestionPage>
                                           latitude: widget.latitude,
                                           uid: widget.uid,
                                           duration: duration,
+                                          answer: _answer,
+                                          listAnswers: widget.listAnswers,
                                         ),
                                       ));
                                 },
@@ -270,6 +281,8 @@ class _QuestionPageState extends State<QuestionPage>
                                           latitude: widget.latitude,
                                           uid: widget.uid,
                                           duration: duration,
+                                          answer: _answer,
+                                          listAnswers: widget.listAnswers,
                                         ),
                                       ));
                                 },
@@ -297,10 +310,12 @@ class _QuestionPageState extends State<QuestionPage>
     answerModel.questionId = questionid;
     answerModel.userId = userId;
 
-    await firebaseFirestore
+    _answer = answerModel;
+
+    /*await firebaseFirestore
         .collection("answers")
         .doc()
-        .set(answerModel.toMap());
+        .set(answerModel.toMap());*/
   }
 
   uploadOpenAnswer(String answer, String questionid, String userId) async {
@@ -311,10 +326,12 @@ class _QuestionPageState extends State<QuestionPage>
     answerModel.questionId = questionid;
     answerModel.userId = userId;
 
-    await firebaseFirestore
+    _answer = answerModel;
+
+    /*await firebaseFirestore
         .collection("answers")
         .doc()
-        .set(answerModel.toMap());
+        .set(answerModel.toMap());*/
   }
 
   uploadCompareAnswer(String answer, String questionid, String userId,
@@ -340,10 +357,12 @@ class _QuestionPageState extends State<QuestionPage>
     answerModel.questionId = questionid;
     answerModel.userId = userId;
 
-    await firebaseFirestore
+    _answer = answerModel;
+
+    /*await firebaseFirestore
         .collection("answers")
         .doc()
-        .set(answerModel.toMap());
+        .set(answerModel.toMap());*/
   }
 
   void startTimer() {

@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:groep11_intro_mobile_project/models/answers_model.dart';
 import 'package:groep11_intro_mobile_project/models/student_exam_model.dart';
 import 'package:groep11_intro_mobile_project/pages/student-dashboard/questionlist_page.dart';
 
@@ -24,6 +25,9 @@ class _StartExamPageState extends State<StartExamPage> {
 
   Duration duration = Duration();
   Timer? timer;
+
+  List<AnswerModel> _answers = [];
+  AnswerModel nullAnswer = AnswerModel();
 
   @override
   void initState() {
@@ -90,6 +94,8 @@ class _StartExamPageState extends State<StartExamPage> {
                   latitude: latitude,
                   uid: uid,
                   duration: duration,
+                  listAnswers: _answers,
+                  answer: nullAnswer,
                 )),
       );
     }).catchError((e) {
