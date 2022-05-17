@@ -20,83 +20,87 @@ class _MultipleQuestionModalState extends State<MultipleQuestionModal> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Multiple question'),
-      content: Container(
-        height: 500,
-        width: 500,
-        child: Form(
-          key: _formKey,
-          child: Column(children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                controller: questionController,
-                decoration: const InputDecoration(
-                  labelText: 'Question',
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter a question';
-                  }
-                  return null;
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                controller: maxGradeController,
-                decoration: const InputDecoration(
-                  labelText: 'Max grade',
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter a max grade';
-                  }
-
-                  if (int.tryParse(value) == null) {
-                    return 'Max grade must be a number';
-                  }
-
-                  return null;
-                },
-              ),
-            ),
-            Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton(
-                        onPressed: () => {
-                              setState(() {
-                                multipleChoices++;
-                              })
-                            },
-                        child: const Text('+')),
-                    ElevatedButton(
-                        onPressed: () => {
-                              setState(() => {
-                                    if (multipleChoices > 2) {multipleChoices--}
-                                  })
-                            },
-                        child: const Text('-'))
-                  ],
-                )),
-            Expanded(child: listView()),
-            ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    await addQuestion();
-                    Navigator.of(context).pop();
-                  }
-                },
-                child: const Text('Create question')),
-          ]),
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text('Multiple Question'),
         ),
-      ),
-    );
+        body: Center(
+          child: Container(
+            height: 500,
+            width: 500,
+            child: Form(
+              key: _formKey,
+              child: Column(children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    controller: questionController,
+                    decoration: const InputDecoration(
+                      labelText: 'Question',
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter a question';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    controller: maxGradeController,
+                    decoration: const InputDecoration(
+                      labelText: 'Max grade',
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter a max grade';
+                      }
+
+                      if (int.tryParse(value) == null) {
+                        return 'Max grade must be a number';
+                      }
+
+                      return null;
+                    },
+                  ),
+                ),
+                Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                            onPressed: () => {
+                                  setState(() {
+                                    multipleChoices++;
+                                  })
+                                },
+                            child: const Text('+')),
+                        ElevatedButton(
+                            onPressed: () => {
+                                  setState(() => {
+                                        if (multipleChoices > 2)
+                                          {multipleChoices--}
+                                      })
+                                },
+                            child: const Text('-'))
+                      ],
+                    )),
+                Expanded(child: listView()),
+                ElevatedButton(
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        await addQuestion();
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: const Text('Create question')),
+              ]),
+            ),
+          ),
+        ));
   }
 
   Widget listView() {
@@ -140,7 +144,7 @@ class _MultipleQuestionModalState extends State<MultipleQuestionModal> {
     await firestore.collection('questions').doc().set({
       "question": questionController.text,
       "max": int.parse(maxGradeController.text),
-      "examType": "1",
+      "examType": 1,
       "answers": answers
     });
   }

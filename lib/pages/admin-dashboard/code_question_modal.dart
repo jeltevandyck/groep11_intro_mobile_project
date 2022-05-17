@@ -21,106 +21,109 @@ class _CodeQuestionModalState extends State<CodeQuestionModal> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Code question'),
-      content: Container(
-        height: 500,
-        width: 500,
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: questionController,
-                decoration: const InputDecoration(
-                  labelText: 'Question',
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter some text';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: codeQuestionController,
-                decoration: const InputDecoration(
-                  labelText: 'Correct code',
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter some text';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: wrongQuestionController,
-                decoration: const InputDecoration(
-                  labelText: 'Wrong code',
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter some text';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: MaxResultsController,
-                decoration: const InputDecoration(
-                  labelText: 'Max results',
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter some text';
-                  }
-                  return null;
-                },
-              ),
-              Row(
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('Code Question'),
+        ),
+        body: Center(
+          child: Container(
+            height: 500,
+            width: 500,
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('Case sensitive'),
+                  TextFormField(
+                    controller: questionController,
+                    decoration: const InputDecoration(
+                      labelText: 'Question',
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter some text';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: codeQuestionController,
+                    decoration: const InputDecoration(
+                      labelText: 'Correct code',
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter some text';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: wrongQuestionController,
+                    decoration: const InputDecoration(
+                      labelText: 'Wrong code',
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter some text';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: MaxResultsController,
+                    decoration: const InputDecoration(
+                      labelText: 'Max results',
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter some text';
+                      }
+                      return null;
+                    },
+                  ),
+                  Row(
+                    children: [
+                      const Text('Case sensitive'),
+                      Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: DropdownButton<String>(
+                            value: widget.isCaseSensitive,
+                            items: ['Yes', 'No'].map((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                            onChanged: (String? value) {
+                              setState(() {
+                                if (value == 'Yes') {
+                                  widget.isCaseSensitive = 'Yes';
+                                } else {
+                                  widget.isCaseSensitive = 'No';
+                                }
+                              });
+                            },
+                          )),
+                    ],
+                  ),
                   Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: DropdownButton<String>(
-                        value: widget.isCaseSensitive,
-                        items: ['Yes', 'No'].map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        onChanged: (String? value) {
-                          setState(() {
-                            if (value == 'Yes') {
-                              widget.isCaseSensitive = 'Yes';
-                            } else {
-                              widget.isCaseSensitive = 'No';
-                            }
-                          });
-                        },
-                      )),
+                    padding: const EdgeInsets.all(10),
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          await pushCodeQuestionToDatabase();
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: const Text('Create'),
+                    ),
+                  ),
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      await pushCodeQuestionToDatabase();
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: const Text('Create'),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 
   pushCodeQuestionToDatabase() async {
