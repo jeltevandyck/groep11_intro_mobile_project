@@ -11,29 +11,26 @@ class AddStudentsPage extends StatefulWidget {
   State<AddStudentsPage> createState() => _AddStudentsPageState();
 }
 
-
 class _AddStudentsPageState extends State<AddStudentsPage> {
-
-  final TextEditingController CSVController =
-      TextEditingController();
+  final TextEditingController CSVController = TextEditingController();
   List<StudentModel> students = [];
 
-loadCSV() async {
+  loadCSV() async {
     String csv = CSVController.text;
     var splittedCSV = csv.split(";");
     List<StudentModel> data = [];
-      for (var student in splittedCSV) {
-        final splittedValue = student.split(',');
-        StudentModel studentModel = StudentModel();
-        studentModel.accountNumber = splittedValue[0];
-        studentModel.fullName = splittedValue[1];
-        data.add(studentModel);
+    for (var student in splittedCSV) {
+      final splittedValue = student.split(',');
+      StudentModel studentModel = StudentModel();
+      studentModel.accountNumber = splittedValue[0];
+      studentModel.fullName = splittedValue[1];
+      data.add(studentModel);
     }
     students = data;
     uploadCSVToFirebase(students);
   }
 
-uploadCSVToFirebase(List<StudentModel> students) async {
+  uploadCSVToFirebase(List<StudentModel> students) async {
     StudentModel studentModel = StudentModel();
     var firebaseFirestore = FirebaseFirestore.instance.collection("students");
     var snapshots = await firebaseFirestore.get();
@@ -47,34 +44,27 @@ uploadCSVToFirebase(List<StudentModel> students) async {
       studentModel.examDone = "false";
 
       await firebaseFirestore
-      .doc(studentModel.accountNumber)
-      .set(studentModel.toMap());
+          .doc(studentModel.accountNumber)
+          .set(studentModel.toMap());
     }
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-        floatingActionButton: SizedBox(
-            height: 100,
-            width: 120,
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 10.0),
-              child: FloatingActionButton(
-                  child: const Text("Upload CSV"),
-                  onPressed: () {
-                    loadCSV();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const StudentsPage()),
-                    );
-                  }),
-            )),
+      floatingActionButton: SizedBox(
+          height: 100,
+          width: 120,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 10.0),
+            child: FloatingActionButton(
+                child: const Text("Upload CSV"),
+                onPressed: () {
+                  loadCSV();
+                  Navigator.pop(context);
+                }),
+          )),
       appBar: AppBar(
         title: const Text("Upload CSV"),
         centerTitle: true,
@@ -82,7 +72,8 @@ uploadCSVToFirebase(List<StudentModel> students) async {
       body: TextFormField(
         controller: CSVController,
         decoration: const InputDecoration(
-            border: OutlineInputBorder(), hintText: "Enter your CSV (AccountNr, FullName;)"),
+            border: OutlineInputBorder(),
+            hintText: "Enter your CSV (AccountNr, FullName;)"),
       ),
     );
   }
