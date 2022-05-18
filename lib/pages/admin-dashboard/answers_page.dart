@@ -113,7 +113,9 @@ class _AnswersPageState extends State<AnswersPage> {
                                 margin: const EdgeInsets.only(bottom: 10.0),
                                 child: FloatingActionButton(
                                     child: const Text("Edit"),
-                                    onPressed: () {showScoreChange(_currentAnswerId, index);}),
+                                    onPressed: () {
+                                      showScoreChange(_currentAnswerId, index);
+                                    }),
                               )),
                           appBar: AppBar(
                             automaticallyImplyLeading: true,
@@ -177,7 +179,8 @@ class _AnswersPageState extends State<AnswersPage> {
                           ),
                           TextButton(
                               onPressed: () {
-                                updateQuestionScore(answerId, scoreController.text);
+                                updateQuestionScore(
+                                    answerId, scoreController.text);
                                 Navigator.pop(context);
                                 Navigator.pop(context);
                                 // build(context);
@@ -190,9 +193,9 @@ class _AnswersPageState extends State<AnswersPage> {
               ));
         });
   }
-  void updateQuestionScore(answerId, grade)async{
+
+  void updateQuestionScore(answerId, grade) async {
     var FBInstance = await FirebaseFirestore.instance;
     FBInstance.collection("answers").doc(answerId).update({'grade': grade});
-    
   }
 }

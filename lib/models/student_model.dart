@@ -7,7 +7,7 @@ class StudentModel {
     this.fullName,this.accountNumber,this.examDone
   });
 
-  factory StudentModel.fromMap(map){
+  factory StudentModel.fromMap(map) {
     return StudentModel(
       fullName: map['fullName'],
       accountNumber: map['accountNumber'],
@@ -15,12 +15,11 @@ class StudentModel {
     );
   }
 
-  Map<String, dynamic> toMap(){
-    return{
+  Map<String, dynamic> toMap() {
+    return {
       'fullName': fullName,
       'accountNumber': accountNumber,
       'examDone': examDone,
     };
   }
-
 }
