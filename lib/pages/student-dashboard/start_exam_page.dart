@@ -10,8 +10,10 @@ import 'package:groep11_intro_mobile_project/models/student_exam_model.dart';
 import 'package:groep11_intro_mobile_project/pages/student-dashboard/questionlist_page.dart';
 
 class StartExamPage extends StatefulWidget {
-  const StartExamPage({this.accountNr, Key? key}) : super(key: key);
+  const StartExamPage({this.accountNr, this.fullName, Key? key})
+      : super(key: key);
   final String? accountNr;
+  final String? fullName;
 
   @override
   State<StartExamPage> createState() => _StartExamPageState();
@@ -89,6 +91,7 @@ class _StartExamPageState extends State<StartExamPage> {
         MaterialPageRoute(
             builder: (context) => QuestionListPage(
                   accountNr: widget.accountNr,
+                  fullName: widget.fullName,
                   count: 0,
                   longitude: longitude,
                   latitude: latitude,

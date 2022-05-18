@@ -130,6 +130,9 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                         String studentState = (documentSnapshot != null)
                             ? (documentSnapshot["examDone"])
                             : "";
+                        String fullName = (documentSnapshot != null)
+                            ? (documentSnapshot["fullName"])
+                            : "";
                         if (studentState == "false") {
                           return Dismissible(
                               key: Key(index.toString()),
@@ -147,7 +150,8 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) => StartExamPage(
-                                                accountNr: accountNr)))
+                                                accountNr: accountNr,
+                                                fullName: fullName)))
                                   },
                                 ),
                               ));

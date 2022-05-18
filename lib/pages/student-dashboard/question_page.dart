@@ -11,6 +11,7 @@ import 'package:groep11_intro_mobile_project/pages/student-dashboard/questionlis
 class QuestionPage extends StatefulWidget {
   QuestionPage(
       {this.accountNr,
+      this.fullName,
       this.questionid,
       this.index,
       this.longitude,
@@ -24,6 +25,7 @@ class QuestionPage extends StatefulWidget {
       : super(key: key);
   final QuestionModal question;
   final String? accountNr;
+  final String? fullName;
   final String? questionid;
   final num? index;
   final double? longitude;
@@ -162,6 +164,7 @@ class _QuestionPageState extends State<QuestionPage>
                                   MaterialPageRoute(
                                     builder: (context) => QuestionListPage(
                                       accountNr: widget.accountNr,
+                                      fullName: widget.fullName,
                                       count: count,
                                       longitude: widget.longitude,
                                       latitude: widget.latitude,
@@ -225,6 +228,7 @@ class _QuestionPageState extends State<QuestionPage>
                                       MaterialPageRoute(
                                         builder: (context) => QuestionListPage(
                                           accountNr: widget.accountNr,
+                                          fullName: widget.fullName,
                                           count: count,
                                           longitude: widget.longitude,
                                           latitude: widget.latitude,
@@ -276,6 +280,7 @@ class _QuestionPageState extends State<QuestionPage>
                                       MaterialPageRoute(
                                         builder: (context) => QuestionListPage(
                                           accountNr: widget.accountNr,
+                                          fullName: widget.fullName,
                                           count: count,
                                           longitude: widget.longitude,
                                           latitude: widget.latitude,
@@ -311,11 +316,6 @@ class _QuestionPageState extends State<QuestionPage>
     answerModel.userId = userId;
 
     _answer = answerModel;
-
-    /*await firebaseFirestore
-        .collection("answers")
-        .doc()
-        .set(answerModel.toMap());*/
   }
 
   uploadOpenAnswer(String answer, String questionid, String userId) async {
@@ -327,11 +327,6 @@ class _QuestionPageState extends State<QuestionPage>
     answerModel.userId = userId;
 
     _answer = answerModel;
-
-    /*await firebaseFirestore
-        .collection("answers")
-        .doc()
-        .set(answerModel.toMap());*/
   }
 
   uploadCompareAnswer(String answer, String questionid, String userId,
@@ -358,11 +353,6 @@ class _QuestionPageState extends State<QuestionPage>
     answerModel.userId = userId;
 
     _answer = answerModel;
-
-    /*await firebaseFirestore
-        .collection("answers")
-        .doc()
-        .set(answerModel.toMap());*/
   }
 
   void startTimer() {

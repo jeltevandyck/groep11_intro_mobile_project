@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:groep11_intro_mobile_project/models/answers_model.dart';
 import 'package:groep11_intro_mobile_project/models/question_model.dart';
+import 'package:groep11_intro_mobile_project/models/student_model.dart';
 import 'package:groep11_intro_mobile_project/pages/Login-dashboard/student_login_page.dart';
 import 'package:groep11_intro_mobile_project/pages/student-dashboard/start_exam_page.dart';
 import '../../models/student_exam_model.dart';
@@ -15,6 +16,7 @@ import 'question_page.dart';
 class QuestionListPage extends StatefulWidget {
   QuestionListPage(
       {this.accountNr,
+      this.fullName,
       this.longitude,
       this.latitude,
       this.uid,
@@ -25,6 +27,7 @@ class QuestionListPage extends StatefulWidget {
       Key? key})
       : super(key: key);
   final String? accountNr;
+  final String? fullName;
   final num? count;
   final double? longitude;
   final double? latitude;
@@ -49,6 +52,8 @@ class _QuestionListPageState extends State<QuestionListPage>
   Duration duration = Duration();
   Timer? timer;
   String twoDigits(int n) => n.toString().padLeft(2, '0');
+
+  StudentExamModel student = StudentExamModel();
 
   @override
   void didChangeDependencies() {
@@ -146,6 +151,7 @@ class _QuestionListPageState extends State<QuestionListPage>
                             uid: widget.uid,
                             duration: duration,
                             listAnswers: widget.listAnswers,
+                            fullName: widget.fullName,
                           ),
                         ));
                   },
@@ -204,6 +210,7 @@ class _QuestionListPageState extends State<QuestionListPage>
                     ("${twoDigits(duration.inHours)}:${twoDigits(duration.inMinutes.remainder(60))}:${twoDigits(duration.inSeconds.remainder(60))}");
                 await updateStudentExam(counter);
                 await uploadExams(widget.listAnswers);
+                await updateStudent(widget.accountNr);
 
                 Navigator.push(
                   context,
@@ -220,6 +227,20 @@ class _QuestionListPageState extends State<QuestionListPage>
         );
       },
     );
+  }
+
+  updateStudent(String? accountnr) async {
+    print(widget.fullName);
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    StudentModel student = StudentModel();
+    student.accountNumber = accountnr;
+    student.examDone = "true";
+    student.fullName = widget.fullName;
+
+    await firebaseFirestore
+        .collection("students")
+        .doc(student.accountNumber)
+        .set(student.toMap());
   }
 
   getQuestionId(int index) async {
