@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:html';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
@@ -35,6 +36,11 @@ class _StartExamPageState extends State<StartExamPage> {
   void initState() {
     super.initState();
     startTimer();
+
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    firestore.collection("student_exams").doc().set({
+      "userId": widget.accountNr,
+    });
   }
 
   @override
@@ -101,9 +107,7 @@ class _StartExamPageState extends State<StartExamPage> {
                   answer: nullAnswer,
                 )),
       );
-    }).catchError((e) {
-      print(e);
-    });
+    }).catchError((e) {});
   }
 
   getStudentExam(accountNr) async {
@@ -112,7 +116,7 @@ class _StartExamPageState extends State<StartExamPage> {
         .where("userId", isEqualTo: accountNr)
         .get();
 
-    setState(() => uid = collection.docs.first["uid"]);
+    setState(() => uid = collection.docs.first.id);
   }
 
   uploadStudentExamToFirebase(String? uid, double? lon, double? lat) async {

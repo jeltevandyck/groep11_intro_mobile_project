@@ -336,13 +336,13 @@ class _QuestionPageState extends State<QuestionPage>
 
     if (casesensitive == true) {
       if (answer.compareTo(correct) == 0) {
-        answerModel.grade = "10";
+        answerModel.grade = "1";
       } else {
         answerModel.grade = "0";
       }
     } else {
       if (answer.toLowerCase().compareTo(correct.toLowerCase()) == 0) {
-        answerModel.grade = "10";
+        answerModel.grade = "1";
       } else {
         answerModel.grade = "0";
       }

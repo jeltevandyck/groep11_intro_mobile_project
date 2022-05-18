@@ -230,7 +230,6 @@ class _QuestionListPageState extends State<QuestionListPage>
   }
 
   updateStudent(String? accountnr) async {
-    print(widget.fullName);
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     StudentModel student = StudentModel();
     student.accountNumber = accountnr;
