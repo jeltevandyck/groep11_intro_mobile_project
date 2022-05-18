@@ -20,7 +20,7 @@ class _StudentsPageState extends State<StudentsPage> {
 
   final _formKey = GlobalKey<FormState>();
 
-  String studentScore = "20";
+  int studentScore = 0;
 
   String? currentAddress;
 
@@ -164,6 +164,7 @@ class _StudentsPageState extends State<StudentsPage> {
   void showStudentInformation(accountNr, fullname) async {
     await getCurrentExitCounter(accountNr);
     await getCurrentTimer(accountNr);
+    await getCurrentStudentScore(accountNr);
     final answersButton = Material(
         elevation: 5,
         borderRadius: BorderRadius.circular(30),
@@ -230,16 +231,25 @@ class _StudentsPageState extends State<StudentsPage> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text("Score: $studentScore"),
+                                  Text("Score: ${studentScore.toString()}"),
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        showStudentInformation(
+                                            accountNr, fullname);
+                                      },
+                                      child: const Text("Refresh"))
                                 ],
                               ),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  Text("the student closed the exam $_currentExitCounter times")
+                                  Text(
+                                      "the student closed the exam $_currentExitCounter times")
                                 ],
-                              ),Row(
+                              ),
+                              Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
@@ -261,19 +271,32 @@ class _StudentsPageState extends State<StudentsPage> {
         });
   }
 
+  getCurrentStudentScore(accountNr) async {
+    QuerySnapshot collection = await FirebaseFirestore.instance
+        .collection("answers")
+        .where("userId", isEqualTo: accountNr)
+        .get();
+    var sum = 0;
+    for (var i = 0; i < collection.docs.length; i++) {
+      sum += int.parse(collection.docs[i]["grade"]);
+    }
+    setState(() => studentScore = sum);
+  }
+
   getCurrentExitCounter(accountNr) async {
     QuerySnapshot collection = await FirebaseFirestore.instance
         .collection("student_exams")
         .where("userId", isEqualTo: accountNr)
         .get();
-      setState(() => _currentExitCounter = collection.docs.first["exitCounter"]);
+    setState(() => _currentExitCounter = collection.docs.first["exitCounter"]);
   }
+
   getCurrentTimer(accountNr) async {
     QuerySnapshot collection = await FirebaseFirestore.instance
         .collection("student_exams")
         .where("userId", isEqualTo: accountNr)
         .get();
-      setState(() => _currentTimer = collection.docs.first["endExam"]);
+    setState(() => _currentTimer = collection.docs.first["endExam"]);
   }
 
   Future<QuerySnapshot<Object?>> getStudentExam(accountNr) async {
@@ -281,7 +304,7 @@ class _StudentsPageState extends State<StudentsPage> {
         .collection("student_exams")
         .where("userId", isEqualTo: accountNr)
         .get();
-      return collection;
+    return collection;
   }
 
   void showLocation(accountNr) async {
@@ -290,10 +313,19 @@ class _StudentsPageState extends State<StudentsPage> {
         .where("userId", isEqualTo: accountNr)
         .get();
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => LocationPage(lat: collection.docs.first["latitude"], lon: collection.docs.first["longitude"])));
+        context,
+        MaterialPageRoute(
+            builder: (context) => LocationPage(
+                lat: collection.docs.first["latitude"],
+                lon: collection.docs.first["longitude"])));
   }
+
   void showAnswers(accountNr) async {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => AnswersPage(accountNr: accountNr,)));
+        context,
+        MaterialPageRoute(
+            builder: (context) => AnswersPage(
+                  accountNr: accountNr,
+                )));
   }
 }
