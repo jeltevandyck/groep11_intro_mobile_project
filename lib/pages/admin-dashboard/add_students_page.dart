@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:groep11_intro_mobile_project/pages/admin-dashboard/students_page.dart';
 
 import '../../models/student_model.dart';
 
@@ -17,7 +18,7 @@ class _AddStudentsPageState extends State<AddStudentsPage> {
       TextEditingController();
   List<StudentModel> students = [];
 
-loadCSV(filePath) async {
+loadCSV() async {
     String csv = CSVController.text;
     var splittedCSV = csv.split(";");
     List<StudentModel> data = [];
@@ -43,6 +44,7 @@ uploadCSVToFirebase(List<StudentModel> students) async {
     for (var i = 0; i < students.length; i++) {
       studentModel.accountNumber = students[i].accountNumber;
       studentModel.fullName = students[i].fullName;
+      studentModel.examDone = "false";
 
       await firebaseFirestore
       .doc(studentModel.accountNumber)
@@ -65,10 +67,11 @@ uploadCSVToFirebase(List<StudentModel> students) async {
               child: FloatingActionButton(
                   child: const Text("Upload CSV"),
                   onPressed: () {
+                    loadCSV();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const AddStudentsPage()),
+                          builder: (context) => const StudentsPage()),
                     );
                   }),
             )),
