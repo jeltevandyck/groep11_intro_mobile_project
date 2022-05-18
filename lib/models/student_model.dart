@@ -4,9 +4,7 @@ class StudentModel {
   String? examDone;
 
   StudentModel({
-    this.fullName,
-    this.accountNumber,
-    this.examDone,
+    this.fullName,this.accountNumber,this.examDone
   });
 
   factory StudentModel.fromMap(map) {
