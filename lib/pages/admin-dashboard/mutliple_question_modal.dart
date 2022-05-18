@@ -10,10 +10,11 @@ class MultipleQuestionModal extends StatefulWidget {
 }
 
 class _MultipleQuestionModalState extends State<MultipleQuestionModal> {
-  int multipleChoices = 2;
+  int multipleChoices = 1;
   List<TextEditingController> controllers = [];
   TextEditingController questionController = TextEditingController();
   TextEditingController maxGradeController = TextEditingController();
+  TextEditingController solutionController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   // create list of TextEditingControllers
@@ -67,6 +68,21 @@ class _MultipleQuestionModalState extends State<MultipleQuestionModal> {
                   ),
                 ),
                 Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    controller: solutionController,
+                    decoration: const InputDecoration(
+                      labelText: 'Solution',
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter a solution';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -81,7 +97,7 @@ class _MultipleQuestionModalState extends State<MultipleQuestionModal> {
                         ElevatedButton(
                             onPressed: () => {
                                   setState(() => {
-                                        if (multipleChoices > 2)
+                                        if (multipleChoices > 1)
                                           {multipleChoices--}
                                       })
                                 },
@@ -141,11 +157,14 @@ class _MultipleQuestionModalState extends State<MultipleQuestionModal> {
       answers += controllers[i].text + ';';
     }
 
+    answers += solutionController.text;
+
     await firestore.collection('questions').doc().set({
       "question": questionController.text,
       "max": int.parse(maxGradeController.text),
       "examType": 1,
-      "answers": answers
+      "answers": answers,
+      "solution": solutionController.text
     });
   }
 }
