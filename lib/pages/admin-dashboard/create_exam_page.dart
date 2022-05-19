@@ -43,6 +43,7 @@ class _CreateExamPageState extends State<CreateExamPage> {
       return Scaffold(
           appBar: AppBar(
             title: const Text("Exam"),
+            automaticallyImplyLeading: false
           ),
           body: Center(
               child: ElevatedButton(
